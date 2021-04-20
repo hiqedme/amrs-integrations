@@ -1,0 +1,23 @@
+{
+  "name": "adt-service",
+  "version": "1.0.0",
+  "description": "Service to enable electronic prescription between AMRS POC and ADT Pharmacy system",
+  "main": "app.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AMPATH/adt-service.git"
+  },
+  "keywords": [
+    "AMRS",
+    "ADT"
+  ],
+  "author": "AMPATH DEVS",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AMPATH/adt-service/issues"
+  },
+  "homepage": "https://github.com/AMPATH/adt-service#readme"
+}
