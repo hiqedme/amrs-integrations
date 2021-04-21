@@ -18,7 +18,7 @@ export default class PatientSubscriber {
         },
       })
       .then(async (resp: any) => {
-        let result: Patient.IPatient[] = resp;
+        let result: Patient.Patient[] = resp;
         if (result[0]?.patient_number_ccc) {
           await patientService.createPatientPrescriptionOnADT(result[0]);
         } else {
@@ -58,15 +58,35 @@ export default class PatientSubscriber {
   }
   @On("createPatient")
   public onPatientCreate({ patient, mflcode }: any) {
-    console.log("SDSD", mflcode, patient);
-    let patients: Patient.IPatient[] = patient;
-    patients[0].patient_number = patients[0].patient_ccc_number;
-    patients[0].mfl_code = mflcode;
-    // Only active patient are eligible for dispense
-    patients[0].current_status = 1;
-    patients[0].partner_status = "Unknown";
-    let payload = patients[0];
-    console.log(payload);
+    let patients: Patient.Patient = patient[0];
+
+    let payload = {
+      source: "PMTCT",
+      medical_record_no: patients.medical_record_no,
+      patient_number_ccc: patients.patient_ccc_number.replace("-", ""),
+      first_name: patients.first_name,
+      last_name: patients.last_name,
+      other_name: patients.other_name,
+      date_of_birth: patients.other_name,
+      place_of_birth: patients.place_of_birth,
+      gender: patients.gender,
+      pregnant: patients.gender ? patients.gender : "",
+      breastfeeding: patients.breastfeeding ? patients.breastfeeding : "",
+      weight: patients.weight,
+      height: patients.height,
+      start_regimen: "PM8",
+      start_regimen_date: patients.start_regimen_date,
+      enrollment_date: patients.enrollment_date,
+      phone: patients.phone,
+      address: patients.address,
+      partner_status: "Unknown",
+      family_planning: patients.family_planning ? patients.family_planning : "",
+      alcohol: patients.alcohol ? patients.alcohol : "",
+      smoke: patients.smoke ? patients.smoke : "",
+      current_status: 1,
+      service: 5,
+      mfl_code: mflcode,
+    };
     const data = new ADTRESTClient();
     data.axios
       .post("/patient", payload)

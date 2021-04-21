@@ -16,12 +16,12 @@ export default class PatientService {
     // dispatch event
     this.eventDispatcher.dispatch("search", { patient, MFLCode });
   }
-  public async createPatientOnADT(patient: Patient.IPatient, MFLCode: string) {
+  public async createPatientOnADT(patient: Patient.Patient, MFLCode: string) {
     // Dispatch create patient
     const mflcode = MFLCode;
     this.eventDispatcher.dispatch("createPatient", { patient, mflcode });
   }
-  public async createPatientPrescriptionOnADT(patient: Patient.IPatient) {
+  public async createPatientPrescriptionOnADT(patient: Patient.Patient) {
     console.log("Creating Prescription for patient", patient);
   }
 
