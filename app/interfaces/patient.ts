@@ -11,9 +11,12 @@ declare namespace Patient {
   }
 
   export interface IPatient {
+    mfl_code: string;
+    patient_number: any;
     mflcode: string;
     source: string;
     medical_record_no: string;
+    patient_ccc_number: string;
     patient_number_ccc: string;
     first_name: string;
     last_name: string;
