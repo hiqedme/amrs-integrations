@@ -2,15 +2,18 @@ import ADTRESTClient from "../loaders/ADT-rest-client";
 import PatientService from "../services/patient";
 import { EventSubscriber, On } from "event-dispatch";
 import { HTTPResponse } from "../interfaces/response";
+import { loadProviderData } from "../models/patient";
+import PrescriptionService from "../services/prescription";
 @EventSubscriber()
 export default class PatientSubscriber {
   @On("search")
   public onPatientSearch({ patient, MFLCode }: any) {
     console.log("Search event has reached here", MFLCode);
     const data = new ADTRESTClient();
+    const prescriptionService = new PrescriptionService();
     const patientService = new PatientService();
     data.axios
-      .get("/patients/" + patient.patient_number_ccc, {
+      .get("/patients/" + patient[0].patient_ccc_number?.replace("-", ""), {
         params: {
           mflcode: MFLCode,
           identifier: "ccc",
@@ -20,7 +23,11 @@ export default class PatientSubscriber {
       .then(async (resp: any) => {
         let result: Patient.Patient[] = resp;
         if (result[0]?.patient_number_ccc) {
-          await patientService.createPatientPrescriptionOnADT(result[0]);
+          await prescriptionService.createAMRSOrder(
+            patient,
+            MFLCode,
+            patient[0].patient_ccc_number
+          );
         } else {
           await patientService.createPatientOnADT(patient, MFLCode);
         }
@@ -72,10 +79,12 @@ export default class PatientSubscriber {
       gender: patients.gender,
       pregnant: patients.gender ? patients.gender : "",
       breastfeeding: patients.breastfeeding ? patients.breastfeeding : "",
-      weight: patients.weight,
-      height: patients.height,
+      weight: patients.weight.toString(),
+      height: patients.height.toString(),
       start_regimen: "PM8",
-      start_regimen_date: patients.start_regimen_date,
+      start_regimen_date: new Date(
+        patients.start_regimen_date
+      ).toLocaleDateString(),
       enrollment_date: patients.enrollment_date,
       phone: patients.phone,
       address: patients.address,
@@ -87,6 +96,7 @@ export default class PatientSubscriber {
       service: 5,
       mfl_code: mflcode,
     };
+    console.log(payload);
     const data = new ADTRESTClient();
     data.axios
       .post("/patient", payload)
@@ -94,6 +104,7 @@ export default class PatientSubscriber {
         console.log(resp.message);
         if (resp.code !== 200) {
           //Publish event with payload and error that occurred
+        } else {
         }
       })
       .catch(

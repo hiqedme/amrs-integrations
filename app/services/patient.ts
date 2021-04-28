@@ -9,10 +9,8 @@ export default class PatientService {
   constructor() {
     this.eventDispatcher = new EventDispatcher();
   }
-
   public async searchADT(personId: string, MFLCode: string) {
     const patient = await this.retrievePatientCCCUsingID(personId);
-
     // dispatch event
     this.eventDispatcher.dispatch("search", { patient, MFLCode });
   }
@@ -21,10 +19,6 @@ export default class PatientService {
     const mflcode = MFLCode;
     this.eventDispatcher.dispatch("createPatient", { patient, mflcode });
   }
-  public async createPatientPrescriptionOnADT(patient: Patient.Patient) {
-    console.log("Creating Prescription for patient", patient);
-  }
-
   public async retrievePatientCCCUsingID(personId: string) {
     const amrsCon = await CM.getConnectionAmrs();
     let amrsPatient = await loadPatientDataByID(personId, amrsCon);
