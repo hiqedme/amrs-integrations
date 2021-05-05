@@ -21,12 +21,6 @@ declare namespace IOrder {
     display: string;
     links: Link[];
   }
-
-  export interface Link4 {
-    rel: string;
-    uri: string;
-  }
-
   export interface Person {
     uuid: string;
     display: string;

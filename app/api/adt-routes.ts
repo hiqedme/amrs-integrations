@@ -24,6 +24,7 @@ export const adtRoutes: ServerRoute[] = [
     handler: function (request, h: ResponseToolkit) {
       // Receive ADT request and Save in drug orders table
       const adt = new PatientService();
+      //Test person id and test location mfl code.
       adt.searchADT("902630", "1235");
     },
   },
