@@ -21,3 +21,12 @@ export async function loadPatientData(personCCC: string, connection: any) {
   let result: Patient.Patient = await CM.query(sql, connection);
   return result;
 }
+export async function loadProviderData(personCCC: string, connection: any) {
+  const sql = `select d.given_name, d.family_name,d.middle_name,d.prefix from etl.flat_adt_patient a
+  inner join amrs.encounter b on a.encounter_id=b.encounter_id
+  inner join amrs.users c on c.user_id = b.creator
+  inner join amrs.person_name d on c.person_id =  d.person_id
+  where patient_ccc_number='${personCCC}'`;
+  let result = await CM.query(sql, connection);
+  return result[0];
+}
