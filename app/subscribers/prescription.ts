@@ -86,7 +86,7 @@ export default class PrescriptionSubscriber {
   public async onCreateAMRSOrder({ patient }: any) {
     const prescriptionService = new PrescriptionService();
     // Call AMRS orders/Encounter endpoint to create the order
-    let order = "ORD-TEST";
+    const order = "ORD-TEST";
     await prescriptionService.createPatientPrescriptionOnADT(
       patient,
       patient.mfl_code,
