@@ -10,7 +10,7 @@ export default class PatientSubscriber {
   @On("search")
   public onPatientSearch({ patient, MFLCode }: any) {
     console.log("Search event has reached here", MFLCode);
-    const data = new ADTRESTClient();
+    const data = new ADTRESTClient("");
     const prescriptionService = new PrescriptionService();
     const patientService = new PatientService();
     data.axios
@@ -76,7 +76,7 @@ export default class PatientSubscriber {
       first_name: patients.first_name,
       last_name: patients.last_name,
       other_name: patients.other_name,
-      date_of_birth: patients.other_name,
+      date_of_birth: new Date(patients.date_of_birth).toISOString(),
       place_of_birth: patients.place_of_birth,
       gender: patients.gender,
       pregnant: patients.gender ? patients.gender : "",
@@ -95,17 +95,29 @@ export default class PatientSubscriber {
       alcohol: patients.alcohol ? patients.alcohol : "",
       smoke: patients.smoke ? patients.smoke : "",
       current_status: 1,
-      service: 5,
+      service: patients.service,
       mfl_code: mflcode,
+      prep: {
+        prep_reason: "test",
+      },
+      pep: {
+        pep_reason: "test",
+      },
     };
     console.log(payload);
-    const data = new ADTRESTClient();
+    const data = new ADTRESTClient("");
+    const prescriptionService = new PrescriptionService();
     data.axios
       .post("/patient", payload)
       .then(async (resp: HTTPResponse) => {
         console.log(resp.message);
-        if (resp.code !== 200) {
+        if (resp.code) {
           //Publish event with payload and error that occurred
+          await prescriptionService.createAMRSOrder(
+            patient,
+            mflcode,
+            patients.patient_ccc_number
+          );
         } else {
         }
       })

@@ -14,7 +14,7 @@ export default {
   connectionLimit: process.env.connectionLimit,
   adt: {
     username: process.env.adtUsername,
-    password: process.env.adtUsername,
+    password: process.env.adtPassword,
     https: false,
     host: process.env.adtHost,
     port: process.env.adtPort,

@@ -1,14 +1,20 @@
 import { ResponseToolkit, ServerRoute } from "@hapi/hapi";
 import { HTTPResponse } from "../interfaces/response";
+import ConnectionManager from "../loaders/mysql";
+import { loadPatientQueue } from "../models/patient";
+import { savePrescription } from "../models/prescription";
 import PatientService from "../services/patient";
 export const adtRoutes: ServerRoute[] = [
   {
     method: "POST",
     path: "/api/prescription",
-    handler: function (request, h: ResponseToolkit) {
+    handler: async function (request, h: ResponseToolkit) {
       // Receive ADT request and Save in drug orders table
-      const payload = request.payload;
-      console.log("payload", payload);
+      const payload = request.payload as IADTDispense.ADTDispense;
+      console.log(payload.drug_details);
+      const CM = ConnectionManager.getInstance();
+      const amrsCon = await CM.getConnectionAmrs();
+      savePrescription(payload, amrsCon);
       let responseMessage: HTTPResponse = {
         code: 200,
         message: "Dispense information received successfully.",
@@ -21,11 +27,14 @@ export const adtRoutes: ServerRoute[] = [
   {
     method: "GET",
     path: "/api/sync-prescription",
-    handler: function (request, h: ResponseToolkit) {
+    handler: async function (request, h: ResponseToolkit) {
       // Receive ADT request and Save in drug orders table
       const adt = new PatientService();
-      //Test person id and test location mfl code.
-      adt.searchADT("902630", "1235");
+      // Test person id and test location mfl code.
+      const a = await adt.searchADT();
+      let response = h.response(a);
+      response.header("Content-Type", "application/json");
+      return response;
     },
   },
 ];

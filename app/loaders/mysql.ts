@@ -50,19 +50,7 @@ export default class ConnectionManager {
       });
     });
   }
-  private async closeAmrsPool() {
-    await this.closePool(this.amrsPool);
-  }
-  private async closePool(pool: Pool): Promise<any> {
-    return new Promise<void>((success, error) => {
-      pool.end((err) => {
-        // all connections in the pool have ended
-        if (err) {
-          error(err);
-        } else {
-          success();
-        }
-      });
-    });
+  async releaseConnections(amrsCon: mysql.Connection) {
+    amrsCon.destroy();
   }
 }

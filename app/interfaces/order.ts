@@ -142,8 +142,7 @@ declare namespace IOrder {
   }
 
   export interface EncounterProvider {
-    uuid: string;
-    display: string;
+    encounterRole: string;
     provider: Provider;
   }
 
@@ -196,48 +195,48 @@ declare namespace IOrder {
   }
 
   export interface Order {
-    uuid: string;
-    orderNumber: string;
+    uuid?: string;
+    orderNumber?: string;
     accessionNumber?: any;
-    patient: Patient;
-    concept: Concept;
-    action: string;
-    careSetting: CareSetting;
+    patient?: Patient;
+    concept?: string;
+    action?: string;
+    careSetting?: string;
     previousOrder?: any;
-    dateActivated: Date;
+    dateActivated?: Date;
     scheduledDate?: any;
     dateStopped?: any;
     autoExpireDate?: any;
-    encounter: Encounter;
-    orderer: Orderer;
+    encounter?: Encounter;
+    orderer?: Orderer;
     orderReason?: any;
     orderReasonNonCoded?: any;
-    orderType: OrderType;
-    urgency: string;
+    orderType?: string;
+    urgency?: string;
     instructions?: any;
     commentToFulfiller?: any;
-    display: string;
-    auditInfo: AuditInfo;
+    display?: string;
+    auditInfo?: AuditInfo;
     specimenSource?: any;
     laterality?: any;
     clinicalHistory?: any;
     frequency?: any;
     numberOfRepeats?: any;
-    links: Link[];
-    type: string;
-    resourceVersion: string;
+    links?: Link[];
+    type?: string;
+    resourceVersion?: string;
   }
 
   export interface Orders {
-    uuid: string;
-    encounterDatetime: Date;
+    uuid?: string;
+    encounterDatetime: string;
     patient: Patient;
-    form: Form;
+    form?: Form;
     visit?: any;
     location: Location;
     encounterType: EncounterType;
     encounterProviders: EncounterProvider[];
-    orders: Order[];
+    orders: any;
     obs: any[];
   }
 }

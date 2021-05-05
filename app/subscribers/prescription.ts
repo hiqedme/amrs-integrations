@@ -8,13 +8,19 @@ import PrescriptionService from "../services/prescription";
 @EventSubscriber()
 export default class PrescriptionSubscriber {
   @On("createADTPrescription")
-  public async onPrescriptionCreate({ patient, amrsCon, order, amrsCCC }: any) {
+  public async onPrescriptionCreate({
+    patient,
+    amrsCon,
+    order,
+    amrsCCC,
+    orderUUID,
+  }: any) {
     let patients: Patient.Patient = patient[0];
     let provider: EPrescription.OrderingPhysician = await loadProviderData(
       amrsCCC,
       amrsCon
     );
-    const data = new ADTRESTClient();
+    const data = new ADTRESTClient("");
     const regimenLoader = new RegimenLoader();
     const regimen = regimenLoader.getRegimenCode(patients.start_regimen)[0];
     let transTime = new Date();
@@ -22,7 +28,7 @@ export default class PrescriptionSubscriber {
       mflcode: patient.mfl_code,
       patient_number_ccc: patients.patient_ccc_number.replace("-", ""),
       order_details: {
-        transaction_datetime: transTime.toLocaleDateString(),
+        transaction_datetime: transTime.toISOString(),
         order_number: order,
         ordering_physician: {
           first_name: provider.given_name,
@@ -32,7 +38,12 @@ export default class PrescriptionSubscriber {
         },
         notes: "",
       },
-      drug_details: [],
+      drug_details: [
+        {
+          prescription_number: orderUUID,
+          drug_code: regimen.toString(),
+        },
+      ],
       patient_observation_details: {
         current_weight: patients.weight,
         current_height: patients.height,
@@ -83,15 +94,133 @@ export default class PrescriptionSubscriber {
       );
   }
   @On("createAMRSOrder")
-  public async onCreateAMRSOrder({ patient }: any) {
+  public async onCreateAMRSOrder({ patient, encounter }: any) {
     const prescriptionService = new PrescriptionService();
     // Call AMRS orders/Encounter endpoint to create the order
-    const order = "ORD-TEST";
-    await prescriptionService.createPatientPrescriptionOnADT(
-      patient,
-      patient.mfl_code,
-      order,
-      patient.patient_ccc_number
-    );
+    const data = new ADTRESTClient("amrs");
+    let patients: Patient.Patient = patient[0];
+    let enc: any = encounter[0];
+    console.log(encounter[0].location_uuid, patients);
+    const payload: IOrder.Orders = {
+      encounterDatetime: new Date(patients.encounter_datetime).toISOString(),
+      patient: enc.patient_uuid,
+      location: enc.location_uuid,
+      encounterType: enc.encounter_type_uuid,
+      encounterProviders: [
+        {
+          provider: enc.provider_uuid,
+          encounterRole: enc.encounter_role,
+        },
+      ],
+      orders: [
+        {
+          // Hardcoded concept for medication order since this is currently not entered by clinicians
+          concept: "a890c3aa-1350-11df-a1f1-0026b9348838",
+          careSetting: "6f0c9a92-6f24-11e3-af88-005056821db0",
+          type: "drugorder",
+          orderer: "f5c7ce7d-e038-45c6-afd8-37c4e541429d",
+          dose: 20,
+          doseUnits: "a8a07f8e-1350-11df-a1f1-0026b9348838",
+          route: "db0c5937-3874-4eae-9566-9a645ad7ac65",
+          frequency: "bc1369f2-6795-11e7-843e-a0d3c1fcd41c",
+          quantity: 10,
+          numRefills: 1,
+          quantityUnits: "a8a07f8e-1350-11df-a1f1-0026b9348838",
+        },
+      ],
+      obs: [],
+    };
+    data.axios
+      .post("ws/rest/v1/encounter/", payload)
+      .then(async (resp: HTTPResponse) => {
+        console.log(resp.orders);
+        if (resp.uuid) {
+          await this.fetchOrderNumber(resp.orders[0].uuid, data, patient);
+        }
+      })
+      .catch(
+        (error: {
+          response: { data: any; status: any; headers: any };
+          request: any;
+          message: any;
+          config: any;
+        }) => {
+          // Error 😨
+          if (error.response) {
+            /*
+             * The request was made and the server responded with a
+             * status code that falls out of the range of 2xx
+             */
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            /*
+             * The request was made but no response was received, `error.request`
+             * is an instance of XMLHttpRequest in the browser and an instance
+             * of http.ClientRequest in Node.js
+             */
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request and triggered an Error
+            console.log("Error", error.message);
+          }
+          console.log(error.config);
+        }
+      );
+  }
+  public async fetchOrderNumber(
+    body: any,
+    data: ADTRESTClient,
+    patient: Patient.Patient
+  ) {
+    let orderNumber = "";
+    const prescriptionService = new PrescriptionService();
+    data.axios
+      .get("ws/rest/v1/order/" + body)
+      .then(async (resp: HTTPResponse) => {
+        if (resp.orderNumber) {
+          //Publish event with payload and error that occurred
+          orderNumber = resp.orderNumber;
+          let orderUUID = resp.uuid;
+          await prescriptionService.createPatientPrescriptionOnADT(
+            patient,
+            patient.mfl_code,
+            orderNumber,
+            patient.patient_ccc_number,
+            orderUUID
+          );
+        }
+      })
+      .catch(
+        (error: {
+          response: { data: any; status: any; headers: any };
+          request: any;
+          message: any;
+          config: any;
+        }) => {
+          // Error 😨
+          if (error.response) {
+            /*
+             * The request was made and the server responded with a
+             * status code that falls out of the range of 2xx
+             */
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            /*
+             * The request was made but no response was received, `error.request`
+             * is an instance of XMLHttpRequest in the browser and an instance
+             * of http.ClientRequest in Node.js
+             */
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request and triggered an Error
+            console.log("Error", error.message);
+          }
+          console.log(error.config);
+        }
+      );
   }
 }

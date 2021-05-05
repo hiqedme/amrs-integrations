@@ -8,7 +8,7 @@ import { adtRoutes } from "./api/adt-routes";
 const init = async () => {
   const server: Server = new Server({
     port: 3000,
-    host: "localhost",
+    host: "0.0.0.0",
   });
   server.route(adtRoutes);
   await server.start();
