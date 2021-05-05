@@ -4,6 +4,7 @@ import { EventSubscriber, On } from "event-dispatch";
 import { HTTPResponse } from "../interfaces/response";
 import { loadProviderData } from "../models/patient";
 import PrescriptionService from "../services/prescription";
+import RegimenLoader from "../loaders/regimen-mapper";
 @EventSubscriber()
 export default class PatientSubscriber {
   @On("search")
@@ -66,9 +67,10 @@ export default class PatientSubscriber {
   @On("createPatient")
   public onPatientCreate({ patient, mflcode }: any) {
     let patients: Patient.Patient = patient[0];
-
+    const regimenLoader = new RegimenLoader();
+    const regimen = regimenLoader.getRegimenCode(patients.start_regimen)[0];
     let payload = {
-      source: "PMTCT",
+      source: patients.source,
       medical_record_no: patients.medical_record_no,
       patient_number_ccc: patients.patient_ccc_number.replace("-", ""),
       first_name: patients.first_name,
@@ -81,7 +83,7 @@ export default class PatientSubscriber {
       breastfeeding: patients.breastfeeding ? patients.breastfeeding : "",
       weight: patients.weight.toString(),
       height: patients.height.toString(),
-      start_regimen: "PM8",
+      start_regimen: regimen,
       start_regimen_date: new Date(
         patients.start_regimen_date
       ).toLocaleDateString(),

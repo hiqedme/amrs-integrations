@@ -1,6 +1,7 @@
 import { EventSubscriber, On } from "event-dispatch";
 import { HTTPResponse } from "../interfaces/response";
 import ADTRESTClient from "../loaders/ADT-rest-client";
+import RegimenLoader from "../loaders/regimen-mapper";
 import { loadProviderData } from "../models/patient";
 import PrescriptionService from "../services/prescription";
 
@@ -14,7 +15,8 @@ export default class PrescriptionSubscriber {
       amrsCon
     );
     const data = new ADTRESTClient();
-
+    const regimenLoader = new RegimenLoader();
+    const regimen = regimenLoader.getRegimenCode(patients.start_regimen)[0];
     let transTime = new Date();
     let payload: EPrescription.DrugOrder = {
       mflcode: patient.mfl_code,
@@ -36,7 +38,7 @@ export default class PrescriptionSubscriber {
         current_height: patients.height,
         // Add the regimen mapping
 
-        current_regimen: patients.start_regimen,
+        current_regimen: regimen.toString(),
       },
     };
     console.log(payload);
