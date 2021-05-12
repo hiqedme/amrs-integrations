@@ -13,6 +13,7 @@ export default {
   port: process.env.port,
   amrsUrl: process.env.amrsUrl,
   connectionLimit: process.env.connectionLimit,
+  server: process.env.server,
   adt: {
     username: process.env.adtUsername,
     password: process.env.adtPassword,

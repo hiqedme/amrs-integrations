@@ -5,10 +5,11 @@ import "./loaders/events";
 //publish an search event for all persons in the queue
 import { Server } from "@hapi/hapi";
 import { adtRoutes } from "./api/adt-routes";
+import config from "./config";
 const init = async () => {
   const server: Server = new Server({
     port: 3000,
-    host: "0.0.0.0",
+    host: config.server,
   });
   server.route(adtRoutes);
   await server.start();

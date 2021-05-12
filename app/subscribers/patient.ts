@@ -81,8 +81,8 @@ export default class PatientSubscriber {
       gender: patients.gender,
       pregnant: patients.gender ? patients.gender : "",
       breastfeeding: patients.breastfeeding ? patients.breastfeeding : "",
-      weight: patients.weight.toString(),
-      height: patients.height.toString(),
+      weight: patients.weight.toString() ? patients.weight.toString() : 0,
+      height: patients.height.toString() ? patients.weight.toString() : 0,
       start_regimen: regimen,
       start_regimen_date: new Date(
         patients.start_regimen_date
