@@ -227,7 +227,7 @@ declare namespace IOrder {
     resourceVersion?: string;
   }
 
-  export interface Orders {
+  export interface DrugOrders {
     uuid?: string;
     encounterDatetime: string;
     patient: Patient;

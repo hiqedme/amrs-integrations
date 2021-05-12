@@ -11,6 +11,7 @@ export default {
   password: process.env.password,
   database: process.env.database,
   port: process.env.port,
+  amrsUrl: process.env.amrsUrl,
   connectionLimit: process.env.connectionLimit,
   adt: {
     username: process.env.adtUsername,

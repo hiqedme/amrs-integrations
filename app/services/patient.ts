@@ -16,6 +16,7 @@ export default class PatientService {
   public async searchADT() {
     const amrsCon = await CM.getConnectionAmrs();
     const patientQueue = await loadPatientQueue(amrsCon);
+    console.log(patientQueue);
     patientQueue.forEach(async (person) => {
       // dispatch event
       const patient = await this.retrievePatientCCCUsingID(person.person_id);

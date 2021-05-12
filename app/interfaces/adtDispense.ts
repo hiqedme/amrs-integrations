@@ -5,6 +5,7 @@ declare module IADTDispense {
   }
 
   export interface DrugDetail {
+    drug_name: string;
     prescription_number: string;
     drug_code: string;
     strength: string;

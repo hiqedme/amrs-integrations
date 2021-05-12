@@ -101,7 +101,7 @@ export default class PrescriptionSubscriber {
     let patients: Patient.Patient = patient[0];
     let enc: any = encounter[0];
     console.log(encounter[0].location_uuid, patients);
-    const payload: IOrder.Orders = {
+    const payload: IOrder.DrugOrders = {
       encounterDatetime: new Date(patients.encounter_datetime).toISOString(),
       patient: enc.patient_uuid,
       location: enc.location_uuid,
@@ -131,7 +131,7 @@ export default class PrescriptionSubscriber {
       obs: [],
     };
     data.axios
-      .post("ws/rest/v1/encounter/", payload)
+      .post("ws/rest/v1/encounter", payload)
       .then(async (resp: HTTPResponse) => {
         console.log(resp.orders);
         if (resp.uuid) {

@@ -7,8 +7,9 @@ export default abstract class HttpClient {
   constructor(baseURL: any) {
     const adtProtocol = config.adt.https ? "https" : "http";
     const adtBaseUrl = adtProtocol + "://" + config.adt.host;
+    const amrsUrl = config.amrsUrl;
     this.axios = axios.create({
-      baseURL: baseURL === "" ? adtBaseUrl : "https://ngx.ampath.or.ke/amrs",
+      baseURL: baseURL === "" ? adtBaseUrl : amrsUrl,
       responseType: "json",
       headers: {
         "Content-Type": "application/json",

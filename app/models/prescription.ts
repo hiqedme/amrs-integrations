@@ -16,7 +16,7 @@ export async function savePrescription(
         prescription.order_details.transaction_datetime,
         prescription.order_details.order_number,
         prescription.drug_details[i].prescription_number,
-        prescription.drug_details[i].drug_code,
+        prescription.drug_details[i].drug_name,
         prescription.drug_details[i].strength,
         prescription.drug_details[i].dosage,
         prescription.drug_details[i].units,

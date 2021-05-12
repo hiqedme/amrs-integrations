@@ -65,10 +65,10 @@ export async function fetchEncounterUUID(personCCC: string, connection: any) {
 }
 export async function loadPatientQueue(connection: Connection) {
   // Only fetch patients from location test.
-  const sql = `select * from etl.adt_poc_integration_queue where mfl_code is null`;
+  const sql = `select * from etl.adt_poc_integration_queue order by date_created desc limit 1`;
   let result: any[] = await CM.query(sql, connection);
-  const dequeue = `Truncate etl.adt_poc_integration_queue`;
   if (result.length > 0) {
+    const dequeue = `delete from etl.adt_poc_integration_queue where person_id='${result[0].person_id}'`;
     await CM.query(dequeue, connection);
   }
   return result;
