@@ -1,0 +1,11 @@
+version: '3'
+services:
+  adt-service:
+    image: 'ampathke/adt-service:latest'
+    env_file: 
+      - .env
+    restart: always
+    ports:
+        - '3000:3000'
+    volumes: 
+        - ./.env:/.env

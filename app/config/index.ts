@@ -11,10 +11,12 @@ export default {
   password: process.env.password,
   database: process.env.database,
   port: process.env.port,
+  amrsUrl: process.env.amrsUrl,
   connectionLimit: process.env.connectionLimit,
+  server: process.env.server,
   adt: {
     username: process.env.adtUsername,
-    password: process.env.adtUsername,
+    password: process.env.adtPassword,
     https: false,
     host: process.env.adtHost,
     port: process.env.adtPort,

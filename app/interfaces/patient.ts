@@ -18,6 +18,7 @@ declare namespace Patient {
     medical_record_no: string;
     patient_ccc_number: string;
     patient_number_ccc: string;
+    encounter_datetime: string;
     first_name: string;
     last_name: string;
     other_name: string;

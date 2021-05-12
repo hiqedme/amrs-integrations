@@ -6,13 +6,18 @@ export async function loadPatientDataByID(
   connection: Connection
 ) {
   const personCCC = await fetchPersonCCCByID(personId, connection);
-
-  return await loadPatientData(personCCC.patient_ccc_number, connection);
+  console.log(personCCC, personId);
+  return await loadPatientData(
+    personCCC.patient_ccc_number
+      ? personCCC.patient_ccc_number
+      : personCCC.medical_record_no,
+    connection
+  );
 }
 
 export async function fetchPersonCCCByID(personId: any, connection: any) {
   //Return static cc for testing.
-  const sql = `select patient_ccc_number from etl.flat_adt_patient where person_id='${personId}'`;
+  const sql = `select patient_ccc_number, medical_record_no from etl.flat_adt_patient where person_id='${personId}'`;
   let result: any = await CM.query(sql, connection);
   return result[0];
 }
@@ -29,4 +34,42 @@ export async function loadProviderData(personCCC: string, connection: any) {
   where patient_ccc_number='${personCCC}'`;
   let result = await CM.query(sql, connection);
   return result[0];
+}
+export async function fetchEncounterUUID(personCCC: string, connection: any) {
+  const sql = `SELECT 
+                loc.uuid AS location_uuid,
+                enc_type.uuid AS encounter_type_uuid,
+                person.uuid AS patient_uuid,
+                provider.uuid AS provider_uuid,
+                'a0b03050-c99b-11e0-9572-0800200c9a66' AS encounter_role,
+                enc.uuid AS encounter_uuid
+              FROM
+                etl.flat_adt_patient a
+                    INNER JOIN
+                amrs.location loc ON loc.location_id = a.location_id
+                    INNER JOIN
+                amrs.encounter_type enc_type ON enc_type.encounter_type_id = a.encounter_type
+                    INNER JOIN
+                amrs.person person ON person.person_id = a.person_id
+                    INNER JOIN
+                amrs.encounter enc ON enc.encounter_id = a.encounter_id
+                    INNER JOIN
+                amrs.encounter_provider enc_prov ON enc_prov.encounter_id = enc.encounter_id
+                    INNER JOIN
+                amrs.provider provider ON provider.provider_id = enc_prov.provider_id
+              WHERE
+                a.patient_ccc_number =  '${personCCC}'`;
+  let result: any = await CM.query(sql, connection);
+  CM.releaseConnections(connection);
+  return result;
+}
+export async function loadPatientQueue(connection: Connection) {
+  // Only fetch patients from location test.
+  const sql = `select distinct(person_id),mfl_code from etl.adt_poc_integration_queue order by date_created desc`;
+  let result: any[] = await CM.query(sql, connection);
+  if (result.length > 0) {
+    const dequeue = `Truncate etl.adt_poc_integration_queue`;
+    await CM.query(dequeue, connection);
+  }
+  return result;
 }

@@ -1,7 +1,11 @@
 import { EventDispatcher } from "event-dispatch/EventDispatcher";
 import ADTRESTClient from "../loaders/ADT-rest-client";
 import ConnectionManager from "../loaders/mysql";
-import { loadPatientData, loadPatientDataByID } from "../models/patient";
+import {
+  loadPatientData,
+  loadPatientDataByID,
+  loadPatientQueue,
+} from "../models/patient";
 const CM = ConnectionManager.getInstance();
 
 export default class PatientService {
@@ -9,10 +13,17 @@ export default class PatientService {
   constructor() {
     this.eventDispatcher = new EventDispatcher();
   }
-  public async searchADT(personId: string, MFLCode: string) {
-    const patient = await this.retrievePatientCCCUsingID(personId);
-    // dispatch event
-    this.eventDispatcher.dispatch("search", { patient, MFLCode });
+  public async searchADT() {
+    const amrsCon = await CM.getConnectionAmrs();
+    const patientQueue = await loadPatientQueue(amrsCon);
+    console.log(patientQueue);
+    patientQueue.forEach(async (person) => {
+      // dispatch event
+      const patient = await this.retrievePatientCCCUsingID(person.person_id);
+      const MFLCode = person.mfl_code;
+      this.eventDispatcher.dispatch("search", { patient, MFLCode });
+    });
+    return patientQueue;
   }
   public async createPatientOnADT(patient: Patient.Patient, MFLCode: string) {
     // Dispatch create patient

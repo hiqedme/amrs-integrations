@@ -5,13 +5,10 @@ import HttpClient from "./http-client";
 
 const token = btoa(config.adt.username + ":" + config.adt.password);
 
-const adtProtocol = config.adt.https ? "https" : "http";
-const adtBaseUrl = adtProtocol + "://" + config.adt.host;
-
 export default class ADTRESTClient extends HttpClient {
   axios: any;
-  constructor() {
-    super(adtBaseUrl);
+  constructor(endpoint: string) {
+    super(endpoint);
     this.initializeResponseInterceptor();
     this.initializeRequestInterceptor();
   }

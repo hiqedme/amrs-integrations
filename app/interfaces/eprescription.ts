@@ -16,13 +16,13 @@ declare module EPrescription {
   export interface DrugDetail {
     prescription_number: string;
     drug_code: string;
-    strength: string;
-    dosage: string;
-    units: string;
-    frequency: string;
-    duration: string;
-    quantity: string;
-    prescription_notes: string;
+    strength?: string;
+    dosage?: string;
+    units?: string;
+    frequency?: string;
+    duration?: string;
+    quantity?: string;
+    prescription_notes?: string;
   }
 
   export interface PatientObservationDetails {
