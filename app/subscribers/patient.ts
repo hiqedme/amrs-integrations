@@ -70,7 +70,7 @@ export default class PatientSubscriber {
     const regimenLoader = new RegimenLoader();
     const regimen = regimenLoader.getRegimenCode(patients.start_regimen)[0];
     let payload = {
-      source: patients.source,
+      source: patients.source ? patients.source : "OUTPATIENT",
       medical_record_no: patients.medical_record_no,
       patient_number_ccc: patients.patient_ccc_number.replace("-", ""),
       first_name: patients.first_name,
@@ -81,8 +81,8 @@ export default class PatientSubscriber {
       gender: patients.gender,
       pregnant: patients.gender ? patients.gender : "",
       breastfeeding: patients.breastfeeding ? patients.breastfeeding : "",
-      weight: patients.weight.toString() ? patients.weight.toString() : 0,
-      height: patients.height.toString() ? patients.weight.toString() : 0,
+      weight: patients.weight ? patients.weight.toString() : 0,
+      height: patients.height ? patients.height.toString() : 0,
       start_regimen: regimen,
       start_regimen_date: new Date(
         patients.start_regimen_date

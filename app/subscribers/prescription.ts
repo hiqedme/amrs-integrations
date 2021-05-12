@@ -53,6 +53,10 @@ export default class PrescriptionSubscriber {
       },
     };
     console.log(payload);
+    if (!patients.weight || !patients.height) {
+      return;
+      //publish errors
+    }
     data.axios
       .post("/prescription", payload)
       .then(async (resp: HTTPResponse) => {
