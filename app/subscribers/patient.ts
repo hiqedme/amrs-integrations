@@ -111,7 +111,7 @@ export default class PatientSubscriber {
       .post("/patient", payload)
       .then(async (resp: HTTPResponse) => {
         console.log(resp.message);
-        if (resp.code) {
+        if (resp.code === 200) {
           //Publish event with payload and error that occurred
           await prescriptionService.createAMRSOrder(
             patient,

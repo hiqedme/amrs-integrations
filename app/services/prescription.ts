@@ -17,6 +17,7 @@ export default class PrescriptionService {
     patient.patient_ccc_number = amrsCCC;
     const amrsCon = await CM.getConnectionAmrs();
     const encounter = await fetchEncounterUUID(amrsCCC, amrsCon);
+    // TODO: Only create order if height and weight are available
     console.log("Creating Order for patient on AMRS", amrsCCC, MFLCode);
     this.eventDispatcher.dispatch("createAMRSOrder", {
       patient,

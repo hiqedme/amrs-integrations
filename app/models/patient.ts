@@ -9,8 +9,8 @@ export async function loadPatientDataByID(
   console.log(personCCC, personId);
   return await loadPatientData(
     personCCC.patient_ccc_number
-      ? personCCC.patient_ccc_number
-      : personCCC.medical_record_no,
+      ? personCCC?.patient_ccc_number
+      : personCCC?.medical_record_no,
     connection
   );
 }
@@ -24,6 +24,7 @@ export async function fetchPersonCCCByID(personId: any, connection: any) {
 export async function loadPatientData(personCCC: string, connection: any) {
   const sql = `select * from etl.flat_adt_patient where patient_ccc_number='${personCCC}'`;
   let result: Patient.Patient = await CM.query(sql, connection);
+  CM.releaseConnections(connection);
   return result;
 }
 export async function loadProviderData(personCCC: string, connection: any) {
@@ -33,6 +34,7 @@ export async function loadProviderData(personCCC: string, connection: any) {
   inner join amrs.person_name d on c.person_id =  d.person_id
   where patient_ccc_number='${personCCC}'`;
   let result = await CM.query(sql, connection);
+  CM.releaseConnections(connection);
   return result[0];
 }
 export async function fetchEncounterUUID(personCCC: string, connection: any) {
@@ -71,5 +73,6 @@ export async function loadPatientQueue(connection: Connection) {
     const dequeue = `Truncate etl.adt_poc_integration_queue`;
     await CM.query(dequeue, connection);
   }
+  CM.releaseConnections(connection);
   return result;
 }

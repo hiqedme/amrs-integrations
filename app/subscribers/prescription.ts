@@ -52,8 +52,8 @@ export default class PrescriptionSubscriber {
         current_regimen: regimen.toString(),
       },
     };
-    console.log(payload);
-    if (!patients.weight || !patients.height) {
+    console.log(patients.height, patients.weight);
+    if (patients.weight === null || patients.height === null) {
       return;
       //publish errors
     }
@@ -134,6 +134,9 @@ export default class PrescriptionSubscriber {
       ],
       obs: [],
     };
+    if (patients.weight == null || patients.height == null) {
+      return;
+    }
     data.axios
       .post("ws/rest/v1/encounter", payload)
       .then(async (resp: HTTPResponse) => {
