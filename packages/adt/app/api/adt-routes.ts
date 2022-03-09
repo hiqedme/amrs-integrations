@@ -1,6 +1,6 @@
 import { ResponseToolkit, ServerRoute } from "@hapi/hapi";
 import { HTTPResponse } from "../interfaces/response";
-import ConnectionManager from "../loaders/mysql";
+import config from "@amrs-integrations/core";
 import { savePrescription } from "../models/prescription";
 import PatientService from "../services/patient";
 import PrescriptionService from "../services/prescription";
@@ -12,7 +12,7 @@ export const adtRoutes: ServerRoute[] = [
       // Receive ADT request and Save in drug orders table
       const payload = request.payload as IADTDispense.ADTDispense;
       console.log(payload.drug_details);
-      const CM = ConnectionManager.getInstance();
+      const CM = config.ConnectionManager.getInstance();
       const amrsCon = await CM.getConnectionAmrs();
       savePrescription(payload, amrsCon);
       let responseMessage: HTTPResponse = {

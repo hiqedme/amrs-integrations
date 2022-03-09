@@ -1,7 +1,7 @@
 import { EventDispatcher } from "event-dispatch/EventDispatcher";
-import ConnectionManager from "../loaders/mysql";
+import config from "@amrs-integrations/core";
 import { loadPatient } from "../models/patient";
-const CM = ConnectionManager.getInstance();
+const CM = config.ConnectionManager.getInstance();
 
 export default class PatientService {
   eventDispatcher: EventDispatcher;

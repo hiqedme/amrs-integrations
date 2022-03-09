@@ -1,9 +1,8 @@
 import { EventDispatcher } from "event-dispatch";
-import ConnectionManager from "../loaders/mysql";
+import config from "@amrs-integrations/core";
 import * as _ from "lodash";
-import PatientService from "../services/patient";
+import PatientService from "./patient";
 import DrugConcepts from "../loaders/drug-list";
-const CM = ConnectionManager.getInstance();
 const PromiseB = require("bluebird");
 
 export default class PrescriptionService {
@@ -24,7 +23,7 @@ export default class PrescriptionService {
     const patient = await patientService.loadPatientData(
       savedAmrsOrders[0].patient.uuid
     );
-    const CM = ConnectionManager.getInstance();
+    const CM = config.ConnectionManager.getInstance();
     const amrsCon = await CM.getConnectionAmrs();
     console.log("Initiate createADTOrder event");
     this.eventDispatcher.dispatch("createADTPrescription", {
@@ -98,7 +97,7 @@ export default class PrescriptionService {
   }
 
   public async getArvConcept(ob: any) {
-    return new Promise((resolve: any, reject: any) => {
+    return new Promise((resolve: any) => {
       if (ob.value.links[0].resourceAlias == "concept") {
         const val = DrugConcepts.filter((c) => c.concept === ob.value.uuid);
         resolve(val);

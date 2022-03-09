@@ -1,6 +1,6 @@
 import { EventSubscriber, On } from "event-dispatch";
 import { HTTPResponse } from "../interfaces/response";
-import ADTRESTClient from "../loaders/ADT-rest-client";
+import config from "@amrs-integrations/core";
 import { loadProviderData, loadEncounterData } from "../models/patient";
 import PrescriptionService from "../services/prescription";
 import RegimenLoader from "../loaders/regimen-mapper";
@@ -72,7 +72,7 @@ export default class PrescriptionSubscriber {
       amrsCon
     );
     let encounter = await loadEncounterData(savedAmrsOrders[0].encounter.uuid);
-    const data = new ADTRESTClient("");
+    const data = new config.HTTPInterceptor("",config.adt.username || '',config.adt.password || '');
     let transTime = new Date();
     const prescriptionService = new PrescriptionService();
 
@@ -173,7 +173,7 @@ export default class PrescriptionSubscriber {
   }
 
   public createAmrsOrder(payload: any) {
-    const data = new ADTRESTClient("amrs");
+    const data = new config.HTTPInterceptor("amrs",config.adt.username || '',config.adt.password || '');
     return new PromiseB((resolve: any, reject: any) => {
       return data.axios
         .post("ws/rest/v1/order", payload)

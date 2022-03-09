@@ -1,0 +1,11 @@
+{
+  "name": "@amrs-integrations/core",
+  "version": "1.0.0",
+  "description": "Shared functions for AMRS integrations",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

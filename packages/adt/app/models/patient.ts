@@ -1,5 +1,5 @@
-import ConnectionManager from "../loaders/mysql";
-const CM = ConnectionManager.getInstance();
+import config from "@amrs-integrations/core";
+const CM = config.ConnectionManager.getInstance();
 
 export async function loadPatient(patient_uuid: string, connection: any) {
   const sql = large_query(patient_uuid);
@@ -28,7 +28,7 @@ export async function loadProviderData(uuid: string, connection: any) {
 }
 
 export async function loadEncounterData(uuid: string) {
-  const CM = ConnectionManager.getInstance();
+  const CM = config.ConnectionManager.getInstance();
   const connection = await CM.getConnectionAmrs();
   const sql = `select * from amrs.encounter where uuid = '${uuid}'`;
   let result = await CM.query(sql, connection);

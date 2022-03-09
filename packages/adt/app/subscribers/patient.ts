@@ -1,4 +1,4 @@
-import ADTRESTClient from "../loaders/ADT-rest-client";
+import config from "@amrs-integrations/core";
 import PatientService from "../services/patient";
 import { EventSubscriber, On } from "event-dispatch";
 import { HTTPResponse } from "../interfaces/response";
@@ -13,7 +13,7 @@ export default class PatientSubscriber {
       MFLCode,
       patient[0].patient_ccc_number
     );
-    const data = new ADTRESTClient("");
+    const data = new config.HTTPInterceptor("",config.adt.username || '',config.adt.password || '');
     const prescriptionService = new PrescriptionService();
     const patientService = new PatientService();
     data.axios
@@ -124,7 +124,7 @@ export default class PatientSubscriber {
       },
     };
     console.log(payload);
-    const data = new ADTRESTClient("");
+    const data = new config.HTTPInterceptor("",config.adt.username || '',config.adt.password || '');
     const prescriptionService = new PrescriptionService();
     data.axios
       .post("/patient", payload)
