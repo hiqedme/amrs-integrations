@@ -13,7 +13,7 @@ export default class PatientSubscriber {
       MFLCode,
       patient[0].patient_ccc_number
     );
-    const data = new config.ADTRESTClient("",config.adt.username || '',config.adt.password || '');
+    const data = new config.HTTPInterceptor("",config.adt.username || '',config.adt.password || '');
     const prescriptionService = new PrescriptionService();
     const patientService = new PatientService();
     data.axios
@@ -124,7 +124,7 @@ export default class PatientSubscriber {
       },
     };
     console.log(payload);
-    const data = new config.ADTRESTClient("",config.adt.username || '',config.adt.password || '');
+    const data = new config.HTTPInterceptor("",config.adt.username || '',config.adt.password || '');
     const prescriptionService = new PrescriptionService();
     data.axios
       .post("/patient", payload)

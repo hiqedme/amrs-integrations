@@ -4,9 +4,11 @@ import mysql, { Connection, Pool } from 'mysql';
 export default class ConnectionManager {
   private static instance: ConnectionManager;
   private amrsPool: Pool;
+  private amrsProdPool: Pool;
 
   private constructor() {
-    this.amrsPool = this.createPool(config);
+    this.amrsPool = this.createPool(config.amrsSlave);
+    this.amrsProdPool = this.createPool(config.amrsProd);
   }
   static getInstance(): ConnectionManager {
     if (!ConnectionManager.instance) {
@@ -27,6 +29,9 @@ export default class ConnectionManager {
   }
   async getConnectionAmrs(): Promise<Connection> {
     return this.getConnection(this.amrsPool);
+  }
+  async getConnectionAmrsProd(): Promise<Connection> {
+    return this.getConnection(this.amrsProdPool);
   }
   private async getConnection(pool: Pool): Promise<Connection> {
     return new Promise<Connection>((success, error) => {

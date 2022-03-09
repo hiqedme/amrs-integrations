@@ -1,0 +1,15 @@
+{
+  "name": "@amrs-integrations/sms",
+  "version": "1.0.0",
+  "description": "package to handle the sms sending and receiving in POC",
+  "main": "index.js",
+  "author": "Derrick Rono",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node ./dist/index.js"
+  },
+  "dependencies": {
+    "@amrs-integrations/core": "1.0.0"
+  }
+}
