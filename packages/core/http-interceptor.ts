@@ -1,11 +1,11 @@
 import { AxiosResponse, AxiosRequestConfig } from "axios";
 import btoa from "btoa";
-import config from './';
+import config from '.';
 import HttpClient from "./http-client";
 
 
 
-export default class ADTRESTClient extends HttpClient {
+export default class HTTPInterceptor extends HttpClient {
   axios: any;
    username:string;
    password: string;

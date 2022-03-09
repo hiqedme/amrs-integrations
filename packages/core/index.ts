@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
-import "./ADT-rest-client"
+import "./http-interceptor"
 import "mysql"
-import ADTRESTClient from "./ADT-rest-client";
+import HTTPInterceptor from "./http-interceptor";
 import ConnectionManager from "./mysql";
 const envFound = dotenv.config();
 if (envFound.error) {
@@ -28,7 +28,7 @@ export default {
   prodDbURL: process.env.prodDbURL,
   prodDbPort: process.env.prodDbPort,
   prodDb: process.env.prodDb,
-  ADTRESTClient:ADTRESTClient,
+  HTTPInterceptor:HTTPInterceptor,
   ConnectionManager:ConnectionManager
 };
 

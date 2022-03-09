@@ -1,7 +1,6 @@
 import mysql, { Connection } from "mysql";
 
 import config from "@amrs-integrations/core";
-import AMRSConnectionManager from "../loaders/mysql-amrs";
 import PrescriptionService from "../services/prescription";
 const prescriptionService = new PrescriptionService();
 const CM = config.ConnectionManager.getInstance();
@@ -38,17 +37,16 @@ export async function savePrescription(
 }
 
 export async function updateAmrsOrderStatus(adtResp: any, status: string) {
-  const AmrsCon = AMRSConnectionManager.getInstance();
-  let connection = await AmrsCon.getConnectionAmrs();
-  AmrsCon.releaseConnections(connection);
-  connection = await AmrsCon.getConnectionAmrs();
+  let connection = await CM.getConnectionAmrs();
+  CM.releaseConnections(connection);
+  connection = await CM.getConnectionAmrs();
   let sql = "";
   adtResp.drug_details.forEach((order: any) => {
     sql = `update amrs.orders set fulfiller_status = '${status}' where order_number = '${order.prescription_number}'`;
   });
-  let result = await AmrsCon.query(sql, connection);
+  let result = await CM.query(sql, connection);
   if (result.affectedRows > 0) {
     console.log("Amrs order status updated successfully");
   }
-  AmrsCon.releaseConnections(connection);
+  CM.releaseConnections(connection);
 }
