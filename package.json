@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "adt": "cd packages/adt && yarn start",
-    "sms": "cd packages/sms-reminder && yarn start",
+    "sms": "cd packages/sms-reminders && yarn start",
     "core": "cd packages/core && tsc",
     "build": "lerna run build",
     "clean": "yarn clean:artifacts && yarn clean:packages && yarn clean:root",

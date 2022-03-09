@@ -37,9 +37,7 @@ export async function savePrescription(
 }
 
 export async function updateAmrsOrderStatus(adtResp: any, status: string) {
-  let connection = await CM.getConnectionAmrs();
-  CM.releaseConnections(connection);
-  connection = await CM.getConnectionAmrs();
+  let connection = await CM.getConnectionAmrsProd();
   let sql = "";
   adtResp.drug_details.forEach((order: any) => {
     sql = `update amrs.orders set fulfiller_status = '${status}' where order_number = '${order.prescription_number}'`;
