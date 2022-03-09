@@ -1,4 +1,8 @@
 import dotenv from "dotenv";
+import "./ADT-rest-client"
+import "mysql"
+import ADTRESTClient from "./ADT-rest-client";
+import ConnectionManager from "./mysql";
 const envFound = dotenv.config();
 if (envFound.error) {
   // This error should crash whole process
@@ -24,4 +28,7 @@ export default {
   prodDbURL: process.env.prodDbURL,
   prodDbPort: process.env.prodDbPort,
   prodDb: process.env.prodDb,
+  ADTRESTClient:ADTRESTClient,
+  ConnectionManager:ConnectionManager
 };
+

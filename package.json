@@ -1,53 +1,25 @@
 {
-  "name": "adt-service",
-  "version": "1.0.0",
-  "description": "Service to enable electronic prescription between AMRS POC and ADT Pharmacy system",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node ./dist/app.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AMPATH/adt-service.git"
-  },
-  "keywords": [
-    "AMRS",
-    "ADT"
+  "name": "root",
+  "private": true,
+  "workspaces": [
+    "packages/**"
   ],
-  "author": "AMPATH DEVS",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/AMPATH/adt-service/issues"
-  },
-  "homepage": "https://github.com/AMPATH/adt-service#readme",
-  "dependencies": {
-    "@hapi/hapi": "^20.1.2",
-    "@types/btoa": "^1.2.1",
-    "@types/node-fetch": "^2.5.7",
-    "abort-controller": "^3.0.0",
-    "axios": "^0.21.1",
-    "btoa": "^1.2.1",
-    "dotenv": "^8.2.0",
-    "event-dispatch": "^0.4.1",
-    "mysql": "^2.18.1",
-    "pm2": "^4.5.6",
-    "typescript": "^4.2.4"
+  "scripts": {
+    "adt": "cd packages/adt && yarn start",
+    "sms": "cd packages/sms-reminder && yarn start",
+    "core": "cd packages/core && tsc",
+    "build": "lerna run build",
+    "clean": "yarn clean:artifacts && yarn clean:packages && yarn clean:root",
+    "clean:artifacts": "lerna run clean --parallel",
+    "clean:packages": "lerna clean --yes",
+    "clean:root": "rm -rf node_modules"
   },
   "devDependencies": {
-    "@tsconfig/node14": "^1.0.0",
-    "@types/hapi__hapi": "^20.0.8",
-    "@types/mysql": "^2.15.15",
-    "husky": "^4.3.0",
-    "lint-staged": "^10.4.0",
-    "prettier": "2.1.2"
+    "dotenv": "^8.2.0",
+    "lerna": "^4.0.0",
+    "mysql": "^2.18.1"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{ts,js,css,md}": "prettier --write"
+  "dependencies": {
+    "bluebird": "^3.7.2"
   }
 }

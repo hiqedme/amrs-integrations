@@ -5,7 +5,7 @@ import "./loaders/events";
 //publish an search event for all persons in the queue
 import { Server } from "@hapi/hapi";
 import { adtRoutes } from "./api/adt-routes";
-import config from "./config";
+import config from "@amrs-integrations/core";
 const init = async () => {
   const server: Server = new Server({
     port: config.port,

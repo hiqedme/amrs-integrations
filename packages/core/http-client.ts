@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import config from "../config";
+import config from "@amrs-integrations/core";
 
 export default abstract class HttpClient {
   protected readonly axios: AxiosInstance;

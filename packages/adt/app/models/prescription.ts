@@ -1,10 +1,10 @@
 import mysql, { Connection } from "mysql";
 
-import ConnectionManager from "../loaders/mysql";
+import config from "@amrs-integrations/core";
 import AMRSConnectionManager from "../loaders/mysql-amrs";
 import PrescriptionService from "../services/prescription";
 const prescriptionService = new PrescriptionService();
-const CM = ConnectionManager.getInstance();
+const CM = config.ConnectionManager.getInstance();
 const table = "etl.adt_drug_orders";
 export async function savePrescription(
   prescription: IADTDispense.ADTDispense,

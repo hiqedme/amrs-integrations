@@ -1,27 +1,27 @@
-import config from "../config";
+import config from "@amrs-integrations/core";
 
 import mysql, { Connection, MysqlError, Pool } from "mysql";
-export default class ConnectionManager {
-  private static instance: ConnectionManager;
+export default class AmrsConnectionManager {
+  private static instance: AmrsConnectionManager;
   private amrsPool: Pool;
 
   private constructor() {
     this.amrsPool = this.createPool(config);
   }
-  static getInstance(): ConnectionManager {
-    if (!ConnectionManager.instance) {
-      ConnectionManager.instance = new ConnectionManager();
+  static getInstance(): AmrsConnectionManager {
+    if (!AmrsConnectionManager.instance) {
+      AmrsConnectionManager.instance = new AmrsConnectionManager();
     }
-    return ConnectionManager.instance;
+    return AmrsConnectionManager.instance;
   }
 
   createPool(conf: any): Pool {
     return mysql.createPool({
-      host: conf.databaseURL,
+      host: conf.prodDbURL,
       user: conf.user,
       password: conf.password,
-      database: conf.database,
-      port: conf.port,
+      database: conf.prodDb,
+      port: conf.prodDbPort,
       connectionLimit: conf.connectionLimit,
     });
   }
@@ -33,7 +33,7 @@ export default class ConnectionManager {
       pool.getConnection((err, conn) => {
         if (err) {
           error(err);
-          return; // not connected!
+          return;
         }
         success(conn);
       });

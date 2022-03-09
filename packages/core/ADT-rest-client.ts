@@ -1,14 +1,19 @@
 import { AxiosResponse, AxiosRequestConfig } from "axios";
 import btoa from "btoa";
-import config from "../config";
+import config from './';
 import HttpClient from "./http-client";
 
-const token = btoa(config.adt.username + ":" + config.adt.password);
+
 
 export default class ADTRESTClient extends HttpClient {
   axios: any;
-  constructor(endpoint: string) {
+   username:string;
+   password: string;
+  constructor(endpoint: string, username: string, password: string) {
     super(endpoint);
+    this.username = username;
+    this.password = password;
+
     this.initializeResponseInterceptor();
     this.initializeRequestInterceptor();
   }
@@ -22,8 +27,8 @@ export default class ADTRESTClient extends HttpClient {
   };
 
   private handleRequest = (config: AxiosRequestConfig) => {
-    config.headers["Authorization"] = "Basic " + token;
-
+    const token = btoa(this.username + ":" + this.password);
+    config.headers!.Authorization =  "Basic " + token;
     return config;
   };
 
