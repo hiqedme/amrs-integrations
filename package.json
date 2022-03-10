@@ -20,8 +20,10 @@
     "mysql": "^2.18.1"
   },
   "dependencies": {
-    "bluebird": "^3.7.2",
     "axios": "^0.26.0",
-    "btoa": "^1.2.1"
+    "bluebird": "^3.7.2",
+    "btoa": "^1.2.1",
+    "moment": "^2.29.1",
+    "redis-smq": "^6.2.6"
   }
 }

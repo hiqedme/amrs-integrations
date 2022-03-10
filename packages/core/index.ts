@@ -45,6 +45,42 @@ export default {
   prodDbPort: process.env.prodDbPort,
   prodDb: process.env.prodDb,
   HTTPInterceptor:HTTPInterceptor,
-  ConnectionManager:ConnectionManager
+  ConnectionManager:ConnectionManager,
+  redis:{
+    namespace: 'amrs-integrations',
+    redis: {
+        client: 'redis',
+        options: {
+            host: process.env.redisHost,
+            port: 6379,
+            connect_timeout: 3600000,
+        },
+    },
+    logger: {
+        enabled: true,
+        options: {
+            level: 'info',
+            /*
+            streams: [
+                {
+                    path: path.normalize(`${__dirname}/../logs/redis-smq.log`)
+                },
+            ],
+            */
+        },
+    },
+    monitor: {
+        enabled: false,
+        host: '127.0.0.1',
+        port: 3000,
+    },
+    message: {
+        consumeTimeout: 60000,
+        retryThreshold: 5,
+        retryDelay: 60000,
+        ttl: 120000,
+    },
+    storeMessages: false,
+}
 };
 
