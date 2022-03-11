@@ -1,55 +1,53 @@
-import config from "@amrs-integrations/core";
+import moment from "moment";
+import { Consumer, Message, Producer } from "redis-smq";
 import { Patient } from "../models/patient";
+import { dailyAppointmentsquery } from "../models/queries";
 export async function RetrieveAppointments(
   daysBeforeRTC: string,
   location: string,
   messageType: string
 ) {
-  let appointmentsUrl =
-    "/etl-latest/etl/daily-appointments/2022-03-09?startIndex=0&startDate=2022-03-09&locationUuids=" +
-    location +
-    "&limit=1&department=HIV";
-  let data = new config.HTTPInterceptor(
-    "",
-    config.amrsUsername || "",
-    config.amrsPassword || ""
-  );
-  data.axios
-    .get(appointmentsUrl, {})
-    .then(async (resp: any) => {
-     
-      let patient: Patient[] = resp.result;
-      console.log(patient);
-    })
-    .catch(
-      (error: {
-        response: { data: any; status: any; headers: any };
-        request: any;
-        message: any;
-        config: any;
-      }) => {
-        // Error 😨
-        if (error.response) {
-          /*
-           * The request was made and the server responded with a
-           * status code that falls out of the range of 2xx
-           */
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          /*
-           * The request was made but no response was received, `error.request`
-           * is an instance of XMLHttpRequest in the browser and an instance
-           * of http.ClientRequest in Node.js
-           */
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request and triggered an Error
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
+  let appointmentDate = moment()
+    .add(daysBeforeRTC, "days")
+    .format("YYYY-MM-DD");
+  let appointments = await dailyAppointmentsquery(appointmentDate);
+  let queueResponse = await QueueAppointments(appointments);
+
+  return queueResponse;
+}
+
+export async function QueueAppointments(patients: Patient[]) {
+  patients.forEach((element) => {
+    const message = new Message();
+    message
+      .setBody(JSON.stringify(element))
+      .setTTL(3600000) // in millis
+      .setQueue("appointments_queue");
+    const producer = new Producer();
+    producer.produce(message, (err) => {
+      if (err) console.log(err);
+      else {
+        const msgId = message.getId(); // string
+        console.log("Successfully produced. Message ID is ", msgId);
       }
-    );
-  console.log(appointmentsUrl);
+    });
+  });
+}
+
+export async function SendNotifications() {
+  const consumer = new Consumer();
+
+const messageHandler = (msg: { getBody: () => any; }, cb: () => void) => {
+   const payload = msg.getBody();
+   console.log('Message payload', payload);
+   cb(); // acknowledging the message
+};
+
+consumer.consume('appointments_queue', false, messageHandler, (err, isRunning) => {
+   if (err) console.error(err);
+   // the message handler will be started only if the consumer is running
+   else console.log(`Message handler has been registered. Running status: ${isRunning}`); // isRunning === false
+});
+
+consumer.run();
 }
