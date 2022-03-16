@@ -72,7 +72,7 @@ export default class PrescriptionSubscriber {
       amrsCon
     );
     let encounter = await loadEncounterData(savedAmrsOrders[0].encounter.uuid);
-    const data = new config.HTTPInterceptor("",config.adt.username || '',config.adt.password || '');
+    const data = new config.HTTPInterceptor("",config.adt.username || '',config.adt.password || '',"adt");
     let transTime = new Date();
     const prescriptionService = new PrescriptionService();
 
@@ -173,7 +173,7 @@ export default class PrescriptionSubscriber {
   }
 
   public createAmrsOrder(payload: any) {
-    const data = new config.HTTPInterceptor("amrs",config.adt.username || '',config.adt.password || '');
+    const data = new config.HTTPInterceptor("amrs",config.adt.username || '',config.adt.password || '',"amrs");
     return new PromiseB((resolve: any, reject: any) => {
       return data.axios
         .post("ws/rest/v1/order", payload)

@@ -1,6 +1,6 @@
 import { AxiosResponse, AxiosRequestConfig } from "axios";
 import btoa from "btoa";
-import config from '.';
+import configs from '.';
 import HttpClient from "./http-client";
 
 
@@ -9,10 +9,12 @@ export default class HTTPInterceptor extends HttpClient {
   axios: any;
    username:string;
    password: string;
-  constructor(endpoint: string, username: string, password: string) {
-    super(endpoint);
+   requestType: string;
+  constructor(endpoint: string, username: string, password: string ,requestType:string) {
+    super(endpoint,requestType);
     this.username = username;
     this.password = password;
+    this.requestType = requestType;
 
     this.initializeResponseInterceptor();
     this.initializeRequestInterceptor();
@@ -27,8 +29,18 @@ export default class HTTPInterceptor extends HttpClient {
   };
 
   private handleRequest = (config: AxiosRequestConfig) => {
-    const token = btoa(this.username + ":" + this.password);
-    config.headers!.Authorization =  "Basic " + token;
+    if(this.requestType === "sms"){
+      config.headers!['apiKey']=configs.sms.apiKey || ""
+      config.headers!['Content-Type'] =  "application/x-www-form-urlencoded"
+      config.headers!['Accept'] =  "application/json"
+      config.responseType = "json";
+    }else{
+      const token = btoa(this.username + ":" + this.password);
+      config.headers!.Authorization =  "Basic " + token;
+      config.headers!['Content-Type'] =  "application/json";
+      config.responseType = "json";
+    }
+   
     return config;
   };
 

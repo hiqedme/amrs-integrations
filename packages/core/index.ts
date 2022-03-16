@@ -46,6 +46,10 @@ export default {
   prodDb: process.env.prodDb,
   HTTPInterceptor:HTTPInterceptor,
   ConnectionManager:ConnectionManager,
+  sms: {
+    apiKey:process.env.apiKey,
+    url:process.env.smsProviderURL
+  },
   redis:{
     namespace: 'amrs-integrations',
     redis: {
