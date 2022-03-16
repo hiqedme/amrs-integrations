@@ -1,6 +1,6 @@
 FROM base as build
 
-COPY ./package.json ./
+COPY ./ ./
 
 RUN npm install
 

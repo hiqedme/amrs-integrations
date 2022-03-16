@@ -25,8 +25,7 @@ export async function SendSMS(params: any) {
       data: qs.stringify({
         username: "sandbox",
         to: "254" + msisdn,
-        message: sms,
-        from:from
+        message: sms
       }),
     }
   );

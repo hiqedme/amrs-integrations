@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
-import HTTPInterceptor from "./http-interceptor";
-import ConnectionManager from "./mysql";
+import HTTPInterceptor from "./app/http-interceptor";
+import ConnectionManager from "./app/mysql";
 const envFound = dotenv.config();
 if (envFound.error) {
   // This error should crash whole process
@@ -74,9 +74,9 @@ export default {
         },
     },
     monitor: {
-        enabled: false,
+        enabled: true,
         host: '127.0.0.1',
-        port: 3000,
+        port: 3333,
     },
     message: {
         consumeTimeout: 60000,
