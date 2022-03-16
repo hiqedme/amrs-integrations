@@ -1,0 +1,4 @@
+FROM node:14 as base
+COPY ./package.json ./
+RUN npm i
+COPY ./lerna.json ./

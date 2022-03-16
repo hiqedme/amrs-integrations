@@ -1,0 +1,7 @@
+FROM base as build
+
+COPY ./package.json ./
+
+RUN npm install
+
+RUN --if-exists npm run build
