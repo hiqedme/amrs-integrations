@@ -47,8 +47,9 @@ export default {
   HTTPInterceptor:HTTPInterceptor,
   ConnectionManager:ConnectionManager,
   sms: {
-    apiKey:process.env.apiKey,
-    url:process.env.smsProviderURL
+    apiKey:process.env.advantaApiKey,
+    url:process.env.advantaURL,
+    partnerID:process.env.advantaPartnerID
   },
   redis:{
     namespace: 'amrs-integrations',
