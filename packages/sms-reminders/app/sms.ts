@@ -19,6 +19,8 @@ export async function SendSMS(params: any) {
     "sms"
   );
   console.log(config.sms.url)
+  //validate and format phone numbers appropriately
+
   let sendSMSResponse: AfricasTalkingResponse = await httpClient.axios(
     "/services/sendsms/",
     {
@@ -28,6 +30,7 @@ export async function SendSMS(params: any) {
         partnerID: config.sms.partnerID,
         apikey: config.sms.apiKey,
         mobile: "254" + msisdn,
+        timeToSend:smsParams.timeToSend,
         message: sms
       }),
     }
