@@ -1,11 +1,12 @@
-FROM alpine:latest
-RUN apk update && apk upgrade
-RUN apk add nodejs npm && node -v
-RUN rm -rf /var/cache/apk/*
+FROM ampathke/amrs-integrations-base
+WORKDIR /packages/adt
+COPY  . ./
 
-COPY . .
 
-RUN npm install typescript -g && tsc
-RUN ls -alh  && pwd
+WORKDIR /packages/adt
+RUN ls -alh && pwd
+RUN npm install --production
+RUN ls -alh && pwd
+RUN yarn run build
 EXPOSE 3000
-CMD ["node", "/dist/app.js"]
+CMD ["node", "/packages/adt/dist/app.js"]

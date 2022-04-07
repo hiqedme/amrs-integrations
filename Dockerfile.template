@@ -1,0 +1,7 @@
+FROM base as build
+
+COPY ./ ./
+
+RUN npm install
+
+RUN --if-exists npm run build

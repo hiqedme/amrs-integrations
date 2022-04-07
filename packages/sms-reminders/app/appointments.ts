@@ -52,6 +52,8 @@ export async function SendNotifications() {
     console.log("Message payload", payload);
     // send sms
     let response = await SendSMS(payload);
+
+    console.log(response);
     //check response for success or error. if error
     cb(); // acknowledging the message
   };

@@ -1,4 +1,4 @@
-import config from ".";
+import config from "..";
 
 import mysql, { Connection, Pool } from 'mysql';
 export default class ConnectionManager {

@@ -18,15 +18,17 @@ export async function SendSMS(params: any) {
     "",
     "sms"
   );
+  console.log(config.sms.url)
   let sendSMSResponse: AfricasTalkingResponse = await httpClient.axios(
-    "/messaging",
+    "/services/sendsms/",
     {
       method: "post",
       data: qs.stringify({
-        username: "sandbox",
-        to: "254" + msisdn,
-        message: sms,
-        from:from
+        shortcode: "JuaMobile",
+        partnerID: config.sms.partnerID,
+        apikey: config.sms.apiKey,
+        mobile: "254" + msisdn,
+        message: sms
       }),
     }
   );

@@ -1,11 +1,12 @@
 {
-  "name": "adt-service",
-  "version": "1.0.0",
+  "name": "@amrs-integrations/adt-service",
+  "version": "0.1.0-alpha.0",
   "description": "Service to enable electronic prescription between AMRS POC and ADT Pharmacy system",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node ./dist/app.js"
+    "start": "tsc && node ./dist/app.js",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -22,21 +23,19 @@
   },
   "homepage": "https://github.com/AMPATH/adt-service#readme",
   "dependencies": {
+    "@amrs-integrations/core": "^0.1.0-alpha.11",
     "@hapi/hapi": "^20.1.2",
-    "@types/btoa": "^1.2.1",
     "@types/node-fetch": "^2.5.7",
     "abort-controller": "^3.0.0",
-    "axios": "^0.21.1",
-    "btoa": "^1.2.1",
     "event-dispatch": "^0.4.1",
     "pm2": "^4.5.6",
-    "typescript": "^4.2.4",
-    "@amrs-integrations/core": "1.0.0"
+    "typescript": "^4.2.4"
   },
   "devDependencies": {
     "@tsconfig/node14": "^1.0.0",
-    "@types/hapi__hapi": "^20.0.8",
+    "@types/hapi__hapi": "^20.0.10",
     "@types/lodash": "^4.14.179",
+    "@types/mysql": "^2.15.21",
     "husky": "^4.3.0",
     "lint-staged": "^10.4.0",
     "prettier": "2.1.2"
@@ -48,5 +47,9 @@
   },
   "lint-staged": {
     "*.{ts,js,css,md}": "prettier --write"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "197b6e670dfedc033a3e16ac280fbb11eef08cc9"
 }

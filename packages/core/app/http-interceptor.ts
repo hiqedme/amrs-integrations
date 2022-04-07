@@ -1,6 +1,6 @@
 import { AxiosResponse, AxiosRequestConfig } from "axios";
 import btoa from "btoa";
-import configs from '.';
+import configs from '../';
 import HttpClient from "./http-client";
 
 

@@ -1,0 +1,7 @@
+version: '3'
+services:
+  sms:
+    image: 'ampathke/amrs-sms:latest'
+    restart: always
+    volumes: 
+        - ./.env:/packages/sms-reminders/.env
