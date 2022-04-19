@@ -63,9 +63,7 @@ export async function SendNotifications() {
     const payload: Patient = msg.getBody();
     console.log("Message payload", payload);
     // send sms
-    // let response = await SendSMS(payload);
-
-    // console.log(response);
+     await SendSMS(payload);
     //check response for success or error. if error
     cb(); // acknowledging the message
   };
