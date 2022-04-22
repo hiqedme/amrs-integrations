@@ -3,11 +3,14 @@ import qs from "qs";
 import { Patient } from "../models/patient";
 import moment from "moment";
 import { AfricasTalkingResponse } from "../models/sms";
+import { isValidPhoneNumber, parsePhoneNumber } from "libphonenumber-js";
 
 export async function SendSMS(params: any) {
   let smsParams:Patient = JSON.parse(params)
   let msisdn = parseInt(smsParams.phone_number, 10);
   // TODO: Check the telco used for the provider then pick approapriate shortcode
+  if(isValidPhoneNumber(smsParams.phone_number,"KE")){
+    const phoneNumber = parsePhoneNumber(smsParams.phone_number,"KE")
   let from = '';
   let appointmentDate = moment(smsParams.rtc_date).format("YYYY-MM-DD");
   let sms =
@@ -18,7 +21,8 @@ export async function SendSMS(params: any) {
     "",
     "sms"
   );
-  console.log(config.sms.url)
+  //validate and format phone numbers appropriately
+
   let sendSMSResponse: AfricasTalkingResponse = await httpClient.axios(
     "/services/sendsms/",
     {
@@ -27,10 +31,14 @@ export async function SendSMS(params: any) {
         shortcode: "JuaMobile",
         partnerID: config.sms.partnerID,
         apikey: config.sms.apiKey,
-        mobile: "254" + msisdn,
+        mobile: phoneNumber.number,
+        timeToSend:smsParams.timeToSend,
         message: sms
       }),
     }
   );
   return sendSMSResponse;
+  }else{
+  console.log("Invalid phone number")
+  }
 }

@@ -5,7 +5,7 @@ export async function dailyAppointmentsquery(appointmentDate: string) {
   let CM = config.ConnectionManager.getInstance();
   let amrsCON = await CM.getConnectionAmrs();
   let sql =
-    "SELECT t2.person_id AS `person_id`,t2.scheduled_date as rtc_date, GROUP_CONCAT(DISTINCT contacts.value SEPARATOR ', ') AS `phone_number`, person_name.given_name AS `person_name` FROM etl.flat_appointment `t2` FORCE INDEX (location_med_pickup_rtc_date) LEFT JOIN ( SELECT fa.encounter_id AS `encounter_id`, MAX(fa.encounter_id) AS `max_encounter_id`, person_id AS `person_id` FROM etl.flat_appointment `fa` FORCE INDEX (location_med_pickup_rtc_date) WHERE (date(fa.scheduled_date) >= '" +
+    "SELECT t1.uuid,t2.person_id AS `person_id`,t2.scheduled_date as rtc_date, GROUP_CONCAT(DISTINCT contacts.value SEPARATOR ', ') AS `phone_number`, person_name.given_name AS `person_name` FROM etl.flat_appointment `t2` FORCE INDEX (location_med_pickup_rtc_date) LEFT JOIN ( SELECT fa.encounter_id AS `encounter_id`, MAX(fa.encounter_id) AS `max_encounter_id`, person_id AS `person_id` FROM etl.flat_appointment `fa` FORCE INDEX (location_med_pickup_rtc_date) WHERE (date(fa.scheduled_date) >= '" +
     appointmentDate +
     "') AND (date(fa.scheduled_date) <= '" +
     appointmentDate +
@@ -13,7 +13,7 @@ export async function dailyAppointmentsquery(appointmentDate: string) {
     appointmentDate +
     "') AND (date(t2.scheduled_date) <= '" +
     appointmentDate +
-    "') AND (t3.program_id IN (1, 4, 2, 11, 10, 19, 30, 9, 8, 3, 20, 25, 27, 28, 29, 31) OR t3.program_id IS NULL) AND (t2.encounter_type NOT IN (21, 99999)) AND (((t2.next_encounter_type <> 116 OR t2.next_encounter_type IS NULL ) OR t2.scheduled_date >= t2.next_encounter_datetime)) AND (t2.is_clinical = 1) AND (t2.is_clinical = 1) AND (fhs.transfer_out_location_id IS NULL OR fhs.transfer_out_location_id <> 9999) AND ((death_reporting.encounter_datetime IS NULL) OR (DATE(t2.scheduled_date) < DATE(death_reporting.encounter_datetime))) AND (1 = (IF(DATE_FORMAT(t2.scheduled_date, '%Y-%m-%d') = '" +
+    "') AND fhs.next_clinical_datetime_hiv is null AND (t3.program_id IN (1, 4, 2, 11, 10, 19, 30, 9, 8, 3, 20, 25, 27, 28, 29, 31) OR t3.program_id IS NULL) AND (t2.encounter_type NOT IN (21, 99999)) AND (((t2.next_encounter_type <> 116 OR t2.next_encounter_type IS NULL ) OR t2.scheduled_date >= t2.next_encounter_datetime)) AND (t2.is_clinical = 1) AND (t2.is_clinical = 1) AND (fhs.transfer_out_location_id IS NULL OR fhs.transfer_out_location_id <> 9999) AND ((death_reporting.encounter_datetime IS NULL) OR (DATE(t2.scheduled_date) < DATE(death_reporting.encounter_datetime))) AND (1 = (IF(DATE_FORMAT(t2.scheduled_date, '%Y-%m-%d') = '" +
     appointmentDate +
     "', 1, NULL))) GROUP BY t1.person_id";
     console.log("Query", sql)
