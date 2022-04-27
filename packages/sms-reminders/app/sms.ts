@@ -28,7 +28,7 @@ export async function SendSMS(params: any) {
     {
       method: "post",
       data: qs.stringify({
-        shortcode: "JuaMobile",
+        shortcode: config.sms.shortCode,
         partnerID: config.sms.partnerID,
         apikey: config.sms.apiKey,
         mobile: phoneNumber.number,
