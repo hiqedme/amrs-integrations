@@ -49,7 +49,8 @@ export default {
   sms: {
     apiKey:process.env.advantaApiKey,
     url:process.env.advantaURL,
-    partnerID:process.env.advantaPartnerID
+    partnerID:process.env.advantaPartnerID,
+    shortCode:process.env.advantaShortCode
   },
   redis:{
     namespace: 'amrs-integrations',
