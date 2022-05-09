@@ -8,6 +8,7 @@
     "adt": "cd packages/adt && yarn start",
     "sms": "cd packages/sms-reminders && yarn start",
     "core": "cd packages/core && tsc",
+    "registry": "cd packages/patient-registry && yarn start",
     "build": "lerna run build",
     "clean": "yarn clean:artifacts && yarn clean:packages && yarn clean:root && rm -rf packages/core/dist",
     "clean:artifacts": "lerna run clean --parallel",
