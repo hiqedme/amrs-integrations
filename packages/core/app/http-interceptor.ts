@@ -34,7 +34,13 @@ export default class HTTPInterceptor extends HttpClient {
       config.headers!['Content-Type'] =  "application/x-www-form-urlencoded"
       config.headers!['Accept'] =  "application/json"
       config.responseType = "json";
-    }else{
+    }else if(this.requestType === "oauth2"){
+      const token = btoa(this.username + ":" + this.password);
+      config.headers!.Authorization = token;
+      config.headers!['Content-Type'] =  "application/json";
+      config.responseType = "json";
+    }
+    else{
       const token = btoa(this.username + ":" + this.password);
       config.headers!.Authorization =  "Basic " + token;
       config.headers!['Content-Type'] =  "application/json";
