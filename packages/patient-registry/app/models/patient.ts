@@ -7,51 +7,55 @@ declare module PatientPayload {
         preferred: boolean;
     }
     export interface Residence {
-        County: string;
-        SubCounty: string;
-        Ward: string;
-        Village: string;
-        LandMark: string;
-        Address: string;
+        county: string;
+        subCounty: string;
+        ward: string;
+        village: string;
+        landMark: string;
+        address: string;
     }
 
     export interface Identification {
-        IdentificationType: string;
-        IdentificationNumber: string;
+        identificationType: string;
+        identificationNumber: string;
     }
 
     export interface Contact {
-        PrimaryPhone: string;
-        SecondaryPhone: string;
-        EmailAddress: string;
+        primaryPhone: string;
+        secondaryPhone: string;
+        emailAddress: string;
     }
     export interface NextOfKin {
-        Name: string;
-        Relationship: string;
-        Residence: string;
-        Contact: Contact;
+        name: string;
+        relationship: string;
+        residence: string;
+        contact: Contact;
     }
 
     export interface Patient {
         uuid: string;
-        ClientNumber: string;
-        FirstName: string;
-        MiddleName: string;
-        LastName: string;
-        DateOfBirth: string;
-        MaritalStatus: string;
-        Gender: string;
-        Occupation: string;
-        Religion: string;
-        EducationLevel: string;
-        Country: string;
-        CountyOfBirth: string;
-        Residence: Residence;
-        Identifications: Identification[];
-        Contact: Contact;
-        NextOfKins: NextOfKin[];
-        OriginFacilityKmflCode: string;
-        IsAlive : boolean;
+        clientNumber: string;
+        firstName: string;
+        middleName: string;
+        lastName: string;
+        dateOfBirth: string;
+        maritalStatus: string;
+        gender: string;
+        occupation: string;
+        religion: string;
+        educationLevel: string;
+        country: string;
+        countyOfBirth: string;
+        residence: Residence;
+        identifications: Identification[];
+        contact: Contact;
+        nextOfKins: NextOfKin[];
+        originFacilityKmflCode: string;
+        isAlive : boolean;
 
+    }
+    export interface ClientObject {
+        clientExists: boolean;
+        client: Patient;
     }
 }
