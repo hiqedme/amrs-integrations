@@ -1,0 +1,30 @@
+[
+  {
+    "value": "muslim",
+    "label": "Muslim"
+  },
+  {
+    "value": "christian",
+    "label": "Christian"
+  },
+  {
+    "value": "hindu",
+    "label": "Hindu"
+  },
+  {
+    "value": "judaism",
+    "label": "Judaism"
+  },
+  {
+    "value": "buddhism",
+    "label": "Buddhism"
+  },
+  {
+    "value": "atheism",
+    "label": "Atheism"
+  },
+  {
+    "value": "other-specify",
+    "label": "Other, specify"
+  }
+]
