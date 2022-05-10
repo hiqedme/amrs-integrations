@@ -87,6 +87,14 @@ export default {
         ttl: 120000,
     },
     storeMessages: false,
+},
+dhp:{
+  clientId:process.env.dhpClientID,
+  clientSecret:process.env.dhpClientSecret,
+  grantType:process.env.dhpGrantType,
+  scope:process.env.dhpScope,
+  url:process.env.dhpURL,
+  authUrl:process.env.dhpTokenURL
 }
 };
 

@@ -10,12 +10,13 @@ export default class HTTPInterceptor extends HttpClient {
    username:string;
    password: string;
    requestType: string;
-  constructor(endpoint: string, username: string, password: string ,requestType:string) {
+   token?:string;
+  constructor(endpoint: string, username: string, password: string ,requestType:string, token?:string) {
     super(endpoint,requestType);
     this.username = username;
     this.password = password;
-    this.requestType = requestType;
-
+    this.requestType = requestType; 
+    this.token=token;  
     this.initializeResponseInterceptor();
     this.initializeRequestInterceptor();
   }
@@ -35,8 +36,9 @@ export default class HTTPInterceptor extends HttpClient {
       config.headers!['Accept'] =  "application/json"
       config.responseType = "json";
     }else if(this.requestType === "oauth2"){
-      const token = btoa(this.username + ":" + this.password);
-      config.headers!.Authorization = token;
+      config.headers!['Content-Type'] =  "application/x-www-form-urlencoded";
+    }else if(this.requestType === "dhp"){
+      config.headers!.Authorization = "Bearer "+this.token;
       config.headers!['Content-Type'] =  "application/json";
       config.responseType = "json";
     }
