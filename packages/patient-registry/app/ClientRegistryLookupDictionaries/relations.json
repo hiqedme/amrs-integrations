@@ -1,0 +1,38 @@
+[
+  {
+    "value": "father",
+    "label": "Father"
+  },
+  {
+    "value": "mother",
+    "label": "Mother"
+  },
+  {
+    "value": "sibling",
+    "label": "Sibling"
+  },
+  {
+    "value": "spouse",
+    "label": "Spouse"
+  },
+  {
+    "value": "uncle",
+    "label": "Uncle"
+  },
+  {
+    "value": "aunt",
+    "label": "Aunt"
+  },
+  {
+    "value": "cousin",
+    "label": "Cousin"
+  },
+  {
+    "value": "grand-parent",
+    "label": "Grand Parent"
+  },
+  {
+    "value": "grand-child",
+    "label": "Grand Child"
+  }
+]

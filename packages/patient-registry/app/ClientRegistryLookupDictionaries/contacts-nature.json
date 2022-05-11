@@ -1,0 +1,14 @@
+[
+    {
+        "value": "next-of-kin",
+        "label": "Next of Kin"
+    },
+    {
+        "value": "emergency-contact",
+        "label": "Emergency Contact"
+    },
+    {
+        "value": "care-giver",
+        "label": "Care Giver"
+    }
+]

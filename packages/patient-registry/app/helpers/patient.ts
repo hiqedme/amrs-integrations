@@ -22,9 +22,10 @@ export async function saveUpiIdentifier(
   patientUuid: string,
   locationUuid: string
 ) {
+  console.log("saving", patientUuid,locationUuid)
   const payload = {
     identifier: upi,
-    identifierType: "cba702b9-4664-4b43-83f1-9ab473cbd64d",
+    identifierType: "8939786b-414b-4dc3-ab3e-74131a1f805d",
     location: locationUuid,
     preferred: false,
   };
@@ -38,5 +39,5 @@ export async function saveUpiIdentifier(
   return await httpClient.axios.post(
     "/ws/rest/v1/patient/" + patientUuid + "/identifier",
     payload
-  );
+  )
 }

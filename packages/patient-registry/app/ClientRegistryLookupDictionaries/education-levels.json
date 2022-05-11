@@ -1,0 +1,14 @@
+[
+  {
+    "value": "primary",
+    "label": "Primary"
+  },
+  {
+    "value": "secondary",
+    "label": "Secondary"
+  },
+  {
+    "value": "college",
+    "label": "College"
+  }
+]
