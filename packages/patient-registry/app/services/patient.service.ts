@@ -15,7 +15,8 @@ export default class PatientService {
       "dhp",
       accessToken.access_token
     );
-    let identifiers = await getPatientIdentifiers(params.patientUuid);
+
+    let identifiers = await getPatientIdentifiers(params.patientUuid)
     const nationalId = identifiers.results.filter(
       (e: any) =>
         e.identifierType.uuid == "58a47054-1359-11df-a1f1-0026b9348838"
@@ -24,18 +25,18 @@ export default class PatientService {
     if (nationalId !== undefined || nationalId.length != 0) {
       const url = "/search/identification-number/" + nationalId[0].identifier;
       let dhpResponse: PatientPayload.ClientObject = await httpClient.axios(
-        "/search/identification-number/3090672",
+        url,
         { method: "get" }
       );
 
-      console.log("Does client exist ", dhpResponse.clientExists);
+      console.log("Does client exist ", dhpResponse.clientExists,nationalId[0].location.uuid);
       if (dhpResponse.clientExists) {
         console.log("DHP client number", dhpResponse.client.clientNumber);
 
         let savedUpi = await this.saveUpiNumber(
           dhpResponse.client.clientNumber,
           params.patientUuid,
-          params.locationUuid
+          nationalId[0].location.uuid
         );
         console.log("Saved UPI, Existing Patient", savedUpi.identifier);
         return;
@@ -44,7 +45,7 @@ export default class PatientService {
       /** Patient not found: Construct payload and save to Registry*/
       let payload = await this.constructPayload(
         params.patientUuid,
-        params.locationUuid
+        nationalId[0].location.uuid
       );
 
       httpClient.axios
@@ -53,7 +54,7 @@ export default class PatientService {
           let savedUpi: any = await this.saveUpiNumber(
             dhpResponse.clientNumber,
             params.patientUuid,
-            params.locationUuid
+            nationalId[0].location.uuid
           );
           console.log("Saved UPI, New Patient", savedUpi.identifier);
         })
@@ -69,7 +70,7 @@ export default class PatientService {
 
   private async constructPayload(patientUuid: string, locationUuid: string) {
     let p: any = await getPatient(patientUuid);
-    let mflCode = await getFacilityMfl(locationUuid);
+    //let mflCode = await getFacilityMfl(locationUuid);
     let identifiers: PatientPayload.PatientIdentifier[] = await getPatientIdentifiers(
       patientUuid
     );
@@ -113,6 +114,7 @@ export default class PatientService {
     locationUuid: string
   ) {
     const result = await saveUpiIdentifier(upi, patientUuid, locationUuid);
+    console.log("result",result)
     return result;
   }
 

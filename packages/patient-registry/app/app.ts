@@ -4,7 +4,7 @@ import { apiRoutes } from "./api/routes";
 const init = async () => {
   const server = new Server({
     port: 3000,
-    host: "localhost",
+    host: "0.0.0.0",
   });
   server.route(apiRoutes);
   await server.start();
