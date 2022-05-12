@@ -19,6 +19,7 @@ export default {
   amrsPassword: process.env.amrsPassword,
   connectionLimit: process.env.connectionLimit,
   server: process.env.devServer,
+  accessToken: process.env.accessToken,
   adt: {
     username: process.env.amrsUsername,
     password: process.env.amrsPassword,

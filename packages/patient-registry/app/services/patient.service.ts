@@ -1,5 +1,5 @@
 import config from "@amrs-integrations/core";
-import getAccessToken from "../helpers/auth";
+import { validateToken } from "../helpers/auth";
 import { saveUpiIdentifier, getPatientIdentifiers } from "../helpers/patient";
 import { getPatient, getFacilityMfl } from "../models/queries";
 import Gender from "../ClientRegistryLookupDictionaries/gender";
@@ -7,35 +7,34 @@ import IdentificationTypes from "../ClientRegistryLookupDictionaries/identificat
 
 export default class PatientService {
   public async searchPatientByID(params: any) {
-    let accessToken = await getAccessToken();
+    let accessToken = await validateToken();
     let httpClient = new config.HTTPInterceptor(
       config.dhp.url || "",
       "",
       "",
       "dhp",
-      accessToken.access_token
+      accessToken
     );
 
     /**TODO: Check against all allowed identifier types (national id, birth number and passport) */
-      const url = "/search/identification-number/" + params.uno;
-      let dhpResponse: PatientPayload.ClientObject = await httpClient.axios(
-        url,
-        { method: "get" }
-      );
+    const url = "/search/identification-number/" + params.uno;
+    let dhpResponse: PatientPayload.ClientObject = await httpClient.axios(url, {
+      method: "get",
+    });
 
-      console.log("dhpResponse ", dhpResponse);
+    console.log("dhpResponse ", dhpResponse);
 
-      return dhpResponse;
+    return dhpResponse;
   }
 
   public async searchPatient(params: any) {
-    let accessToken = await getAccessToken();
+    let accessToken = await validateToken();
     let httpClient = new config.HTTPInterceptor(
       config.dhp.url || "",
       "",
       "",
       "dhp",
-      accessToken.access_token
+      accessToken
     );
 
     let identifiers = await getPatientIdentifiers(params.patientUuid);
