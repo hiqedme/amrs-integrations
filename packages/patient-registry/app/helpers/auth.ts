@@ -1,16 +1,65 @@
 import qs from "qs";
-import config from "@amrs-integrations/core"
+import * as fs from "fs";
+import config from "@amrs-integrations/core";
 export default async function getAccessToken() {
-    // TODO: Remove in production
-    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-    var data = qs.stringify({
-        'client_id': config.dhp.clientId,
-        'client_secret':config.dhp.clientSecret,
-        'grant_type': config.dhp.grantType,
-        'scope': config.dhp.scope 
-      });
-      console.log(data)
-      let httpClient = new config.HTTPInterceptor(config.dhp.authUrl || "","","","oauth2")
-      let response = await httpClient.axios("/connect/token",{method:"post",data:data})
-      return response;
+  // Validate token in file
+  var data = qs.stringify({
+    client_id: config.dhp.clientId,
+    client_secret: config.dhp.clientSecret,
+    grant_type: config.dhp.grantType,
+    scope: config.dhp.scope,
+  });
+  console.log(data);
+  let httpClient = new config.HTTPInterceptor(
+    config.dhp.authUrl || "",
+    "",
+    "",
+    "oauth2"
+  );
+  let response = await httpClient.axios("/connect/token", {
+    method: "post",
+    data: data,
+  });
+  // write response to file
+  fs.writeFile(
+    config.accessToken || "token.txt",
+    response.access_token,
+    (err: any) => {
+      if (err) {
+        console.error(err);
+      }
+    }
+  );
+  return response;
+}
+
+export async function validateToken() {
+  let isValid = false;
+  // TODO: Remove in production
+  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+  try {
+    const data = fs.readFileSync(config.accessToken || "token.txt", "utf8");
+    let expirationTime = parseJwt(data).exp;
+    expirationTime < (new Date().getTime() + 1) / 1000
+      ? (isValid = false)
+      : (isValid = true);
+    if (isValid) {
+      console.log("Fetch old accesstoken", data);
+      return data;
+    } else {
+      let response = await getAccessToken();
+      console.log("Getting new accesstoken", response);
+      return response.access_token;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+function parseJwt(token: string) {
+  var base64Url = token.split(".")[1];
+  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const buff = new Buffer(base64, "base64");
+  const payloadinit = buff.toString("ascii");
+  const payload = JSON.parse(payloadinit);
+  return payload;
 }
