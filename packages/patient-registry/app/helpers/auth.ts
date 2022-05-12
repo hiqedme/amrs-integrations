@@ -39,13 +39,19 @@ export async function validateToken() {
   process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
   try {
     const data = fs.readFileSync(config.accessToken || "token.txt", "utf8");
-    let expirationTime = parseJwt(data).exp;
-    expirationTime < (new Date().getTime() + 1) / 1000
-      ? (isValid = false)
-      : (isValid = true);
-    if (isValid) {
-      console.log("Fetch old accesstoken", data);
-      return data;
+    if (data !== "") {
+      let expirationTime = parseJwt(data).exp;
+      expirationTime < (new Date().getTime() + 1) / 1000
+        ? (isValid = false)
+        : (isValid = true);
+      if (isValid) {
+        console.log("Fetch old accesstoken", data);
+        return data;
+      } else {
+        let response = await getAccessToken();
+        console.log("Getting new accesstoken", response);
+        return response.access_token;
+      }
     } else {
       let response = await getAccessToken();
       console.log("Getting new accesstoken", response);
