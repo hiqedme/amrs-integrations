@@ -4,6 +4,7 @@ import { saveUpiIdentifier, getPatientIdentifiers } from "../helpers/patient";
 import { getPatient, getFacilityMfl } from "../models/queries";
 import Gender from "../ClientRegistryLookupDictionaries/gender";
 import IdentificationTypes from "../ClientRegistryLookupDictionaries/identification-types";
+import { Consumer, Message, Producer } from "redis-smq";
 
 export default class PatientService {
   public async searchPatientByID(params: any) {
@@ -84,6 +85,12 @@ export default class PatientService {
           console.log("Saved UPI, New Patient", savedUpi.identifier);
         })
         .catch((err: any) => {
+          // Queue Patient
+           queueClientsToRetry({
+            payload: payload,
+            patientUuid: params.patientUuid,
+            locationUuid: nationalId[0].location.uuid,
+          });
           console.log("Error creating patient ", err);
         });
 
@@ -171,4 +178,51 @@ export default class PatientService {
     const idType = IdentificationTypes.filter((i) => (i.amrs = amrsId));
     return idType[0].value;
   }
+}
+function queueClientsToRetry(patientPayload: any) {
+  const producer = new Producer();
+  const message = new Message();
+  message
+  .setBody(JSON.stringify(patientPayload))
+  .setTTL(3600000) // in millis
+  .setQueue("cl_queue");
+  producer.produce(message, (err) => {
+    if (err) console.log(err);
+    else {
+      const msgId = message.getId(); // string
+      console.log("Successfully produced. Message ID is ", msgId);
+    }
+  });
+  producer.shutdown();
+}
+function retryQueuedClients() {
+  const consumer = new Consumer();
+
+  const messageHandler = async (
+    msg: { getBody: () => any },
+    cb: () => void
+  ) => {
+    const payload: any = msg.getBody();
+    console.log("Message payload", payload);
+    // TODO : Implement logic to consume errors and resend requests to DHP
+
+    //check response for success or error. if error
+    cb(); // acknowledging the message
+  };
+
+  consumer.consume(
+    "cl_queue",
+    false,
+    messageHandler,
+    (err, isRunning) => {
+      if (err) console.error(err);
+      // the message handler will be started only if the consumer is running
+      else
+        console.log(
+          `Message handler has been registered. Running status: ${isRunning}`
+        ); // isRunning === false
+    }
+  );
+
+  consumer.run();
 }
