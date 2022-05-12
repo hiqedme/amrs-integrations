@@ -1,0 +1,7 @@
+version: '3'
+services:
+  registry:
+    image: 'ampathke/patient-registry:latest'
+    restart: always
+    volumes: 
+        - ./.env:/packages/patient-registry/.env
