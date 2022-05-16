@@ -1,7 +1,7 @@
 const IdentificationTypes = [
   {
     "amrs":"58a47054-1359-11df-a1f1-0026b9348838",
-    "value": "identification-number",
+    "value": "national-id",
     "label": "National ID"
   },
   {

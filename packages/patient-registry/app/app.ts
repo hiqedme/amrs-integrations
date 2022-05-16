@@ -1,11 +1,13 @@
 import { Server } from "@hapi/hapi";
 import { apiRoutes } from "./api/routes";
 import config from "@amrs-integrations/core";
-
+import { setConfiguration } from "redis-smq";
+let redisConfig: any = config.redis;
+setConfiguration(redisConfig);
 const init = async () => {
   const server = new Server({
     port: config.devPort,
-    host: config.server
+    host: config.server,
   });
   server.route(apiRoutes);
   await server.start();
