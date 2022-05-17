@@ -1,0 +1,37 @@
+{
+    "templates":[
+        {
+            "type":"welcome",
+            "english":"Hello $personName$.Thank you for enrolling to Uzima SMS platform .Your Health is  Our Happiness",
+            "kiswahili":"Jambo $personName$.Asante kwa kujisajili kwa huduma ya Uzima SMS. Afya Yako ni Furaha Yetu"
+        },{
+            "type":"4days",
+            "english":"Hallo $personName$, kindly remember your appointment is due on $rtc_date$. Your Health is our happiness!",
+            "kiswahili":"Hujambo $personName$? Unaombwa uje kwa miadi yako tarehe $rtc_date$. Afya Yako Ni Furaha Yetu."
+        },{
+            "type":"1day",
+            "english":"Hallo $personName$, kindly remember your appointment is due TOMORROW $rtc_date$. Your Health is our happiness!",
+            "kiswahili":"Hujambo $personName$? Unaombwa uje kwa miadi yako KESHO  $rtc_date$. Afya Yako Ni Furaha Yetu"
+        },
+        {
+            "type":"sameday",
+            "english":"Hallo $personName$, kindly remember your appointment is due TODAY $rtc_date$. Your Health is our happiness!",
+            "kiswahili":"Hujambo $personName$? Unaombwa uje kwa miadi yako LEO $rtc_date$. Afya Yako Ni Furaha Yetu"
+        },
+        {
+            "type":"tcahonored",
+            "english":"Hallo $personName$, thank you for keeping your appointment. We look forward to serving you again on date.Your Health is our Happiness!",
+            "kiswahili":"Hujambo $personName$? Tunashukuru kwa kufika kwako. Tunatarajia kukuhudumia tena siku na tarehe.Afya yako ni Furaha Yetu! "
+        },
+        {
+            "type":"tcamissed",
+            "english":"How are you $personName$? Your appointment was due yesterday and date. Kindly make an effort to visit us as soon as possible.Incase of any concerns reach us on this number 0800720260.Afya yako ni Furaha Yetu!",
+            "kiswahili":"Hujambo $personName$.Je,waendeleaje?Ulikosa Miadi yako jana.Tafadhali jaribu kututembelea haraka iwezekanavyo.Ikiwa kuna jambo lolote,piga simu kwa nambari 0800720260"
+        },
+        {
+            "type":"optout",
+            "english":"Thank you for being part of Uzima SMS, you have opted out and you will no longer receive messages. It was a pleasure serving you.Welcome back again .",
+            "kiswahili":"Asante kwa kuwa nasi.Unakaribishwa tena."
+        }
+    ]
+}

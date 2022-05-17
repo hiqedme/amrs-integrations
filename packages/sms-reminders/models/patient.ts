@@ -27,4 +27,6 @@ export interface Patient {
         previous_vl_date: string;
         nearest_center: string;
         timeToSend:string;
+        language:string;
+        messageType:string;
 }
