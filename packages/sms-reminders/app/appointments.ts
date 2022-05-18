@@ -1,7 +1,12 @@
 import moment from "moment";
 import { Consumer, Message, Producer } from "redis-smq";
 import { Patient } from "../models/patient";
-import { dailyAppointmentsquery } from "../models/queries";
+import {
+  dailyAppointmentsquery,
+  getConsentedAndOptedoutClients,
+  getHonoredAppointments,
+  getMissedAppointments,
+} from "../models/queries";
 import { SendSMS } from "./sms";
 import config from "@amrs-integrations/core";
 import qs from "qs";
@@ -13,24 +18,34 @@ export async function RetrieveAppointments(
   let appointmentDate = moment()
     .add(daysBeforeRTC, "days")
     .format("YYYY-MM-DD");
-  let appointments = await dailyAppointmentsquery(appointmentDate);
-  await QueueAppointments(appointments);
+  if (messageType === "welcome" || messageType === "optout") {
+    //Retrieve clients who have consented and never received a welcome message;
+    let clients = await getConsentedAndOptedoutClients();
+    //await QueueAppointments(clients,messageType)
+  } else if (messageType === "congratulations") {
+    let honouredAppointments = await getHonoredAppointments();
+  } else if (messageType === "missed") {
+    let missedAppointments = await getMissedAppointments();
+  } else {
+    let appointments = await dailyAppointmentsquery(appointmentDate);
+    //await QueueAppointments(appointments,messageType);
+  }
 }
 
-export async function QueueAppointments(patients: Patient[]) {
+export async function QueueAppointments(patients: Patient[],messageType:string) {
   let count = 0;
   const producer = new Producer();
   patients.forEach(async (element) => {
     const message = new Message();
     // get consent
-    let consentTime = await GetPatientConsent(
-     element.uuid
-    );
-    if (consentTime !== "") {
+    let consent = await GetPatientConsent(element.uuid);
+    if (consent[0] !== "" || messageType === "optout") {
       element.timeToSend =
         moment().format("YYYY-MM-DD") +
         " " +
-        moment(consentTime).format("HH:mm");
+        moment(consent[0]).format("HH:mm");
+      element.language = consent[1]
+      element.messageType = messageType
       message
         .setBody(JSON.stringify(element))
         .setTTL(3600000) // in millis
@@ -63,7 +78,7 @@ export async function SendNotifications() {
     const payload: Patient = msg.getBody();
     console.log("Message payload", payload);
     // send sms
-     await SendSMS(payload);
+    await SendSMS(payload);
     //check response for success or error. if error
     cb(); // acknowledging the message
   };
@@ -92,6 +107,7 @@ export async function GetPatientConsent(patientUUID: string) {
     "amrs"
   );
   let consentedTime = "";
+  let consentedLanguage = "";
   let consent: any = await httpClient.axios(
     "/ws/rest/v1/obs?" +
       qs.stringify({
@@ -108,19 +124,29 @@ export async function GetPatientConsent(patientUUID: string) {
     consent.results.length > 0 &&
     consent.results[0].value.display === "YES"
   ) {
-    let smsTime = await httpClient.axios(
+    let smsTimeandLanguage = await httpClient.axios(
       "/ws/rest/v1/obs?" +
         qs.stringify({
           patient: patientUUID,
-          concept: "4e1a9d59-3d06-47eb-82a7-30410db249e4",
+          concepts:
+            "4e1a9d59-3d06-47eb-82a7-30410db249e4,a89e54e8-1350-11df-a1f1-0026b9348838",
           v: "custom:(value,concept:(uuid,uuid,name:(display)))",
-          limit: 1,
         }),
       {
         method: "get",
       }
     );
-    consentedTime = smsTime.results[0].value;
+    consentedTime = smsTimeandLanguage.results.find(
+      (x: { concept: { uuid: string } }) =>
+        x.concept.uuid === "4e1a9d59-3d06-47eb-82a7-30410db249e4"
+    ).value;
+    consentedLanguage =
+      smsTimeandLanguage.results.find(
+        (x: { concept: { uuid: string } }) =>
+          x.concept.uuid === "a89e54e8-1350-11df-a1f1-0026b9348838"
+      ).value.display === "ENGLISH"
+        ? "english"
+        : "kiswahili";
   }
-  return consentedTime;
+  return [consentedTime,consentedLanguage];
 }
