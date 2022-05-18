@@ -3,6 +3,8 @@ import { validateToken } from "../helpers/auth";
 import { saveUpiIdentifier, getPatientIdentifiers } from "../helpers/patient";
 import { getPatient, getFacilityMfl } from "../models/queries";
 import Gender from "../ClientRegistryLookupDictionaries/gender";
+import Countries from "../ClientRegistryLookupDictionaries/countries";
+import Counties from "../ClientRegistryLookupDictionaries/counties";
 import IdentificationTypes from "../ClientRegistryLookupDictionaries/identification-types";
 import { Consumer, Message, Producer } from "redis-smq";
 
@@ -17,12 +19,24 @@ export default class PatientService {
       accessToken
     );
 
-    /**TODO: Check against all allowed identifier types (national id, birth number and passport) */
-      const url = "/search/national-id/" + params.uno;
-      let dhpResponse: PatientPayload.ClientObject = await httpClient.axios(
-        url,
-        { method: "get" }
-      );
+    const searchIdType = params.idType;
+    let idParam = "national-id";
+
+    switch (searchIdType) {
+      case "58a47054-1359-11df-a1f1-0026b9348838":
+        idParam = "national-id";
+        break;
+      case "7924e13b-131a-4da8-8efa-e294184a1b0d":
+        idParam = "birth-certificate";
+        break;
+      case "ced014a1-068a-4a13-b6b3-17412f754af2":
+        idParam = "passport";
+        break;
+    }
+    const url = `/search/${idParam}/${params.uno}`;
+    let dhpResponse: PatientPayload.ClientObject = await httpClient.axios(url, {
+      method: "get",
+    });
 
     console.log("dhpResponse ", dhpResponse);
 
@@ -40,40 +54,56 @@ export default class PatientService {
     );
 
     let identifiers = await getPatientIdentifiers(params.patientUuid);
-    const nationalId = identifiers.results.filter(
-      (e: any) =>
-        e.identifierType.uuid == "58a47054-1359-11df-a1f1-0026b9348838"
-    );
-    /**TODO: Check against all allowed identifier types (national id, birth number and passport) */
-    if (nationalId !== undefined || nationalId.length != 0) {
-      const url = "/search/national-id/" + nationalId[0].identifier;
+    let idParam = "";
+    let identifier = "";
+    let location = "";
+    identifiers.results.forEach((id: any) => {
+      if (id.identifierType.uuid == "58a47054-1359-11df-a1f1-0026b9348838") {
+        idParam = "national-id";
+        identifier = id.identifier;
+        location = id.location.uuid;
+        return;
+      } else if (
+        id.identifierType.uuid == "7924e13b-131a-4da8-8efa-e294184a1b0d"
+      ) {
+        idParam = "birth-certificate";
+        identifier = id.identifier;
+        location = id.location.uuid;
+        return;
+      } else if (
+        id.identifierType.uuid == "ced014a1-068a-4a13-b6b3-17412f754af2"
+      ) {
+        idParam = "passport";
+        identifier = id.identifier;
+        location = id.location.uuid;
+        return;
+      }
+    });
+
+    console.log("search params ", idParam, identifier, location);
+
+    if (idParam.length != 0) {
+      const url = `/search/${idParam}/${identifier}`;
       let dhpResponse: PatientPayload.ClientObject = await httpClient.axios(
         url,
         { method: "get" }
       );
 
-      console.log(
-        "Does client exist ",
-        dhpResponse.clientExists,
-        nationalId[0].location.uuid
-      );
+      console.log("Does client exist in registry ", dhpResponse.clientExists);
       if (dhpResponse.clientExists) {
         console.log("DHP client number", dhpResponse.client.clientNumber);
 
         let savedUpi = await this.saveUpiNumber(
           dhpResponse.client.clientNumber,
           params.patientUuid,
-          nationalId[0].location.uuid
+          location
         );
         console.log("Saved UPI, Existing Patient", savedUpi.identifier);
         return;
       }
 
       /** Patient not found: Construct payload and save to Registry*/
-      let payload = await this.constructPayload(
-        params.patientUuid,
-        nationalId[0].location.uuid
-      );
+      let payload = await this.constructPayload(params.patientUuid, location);
 
       httpClient.axios
         .post("", payload)
@@ -81,16 +111,16 @@ export default class PatientService {
           let savedUpi: any = await this.saveUpiNumber(
             dhpResponse.clientNumber,
             params.patientUuid,
-            nationalId[0].location.uuid
+            location
           );
           console.log("Saved UPI, New Patient", savedUpi.identifier);
         })
         .catch((err: any) => {
           // Queue Patient
-           queueClientsToRetry({
+          queueClientsToRetry({
             payload: payload,
             patientUuid: params.patientUuid,
-            locationUuid: nationalId[0].location.uuid,
+            locationUuid: location,
           });
           console.log("Error creating patient ", err);
         });
@@ -103,7 +133,7 @@ export default class PatientService {
 
   private async constructPayload(patientUuid: string, locationUuid: string) {
     let p: any = await getPatient(patientUuid);
-    //let mflCode = await getFacilityMfl(locationUuid);
+    let mflCode = await getFacilityMfl(locationUuid);
     let identifiers: PatientPayload.PatientIdentifier[] = await getPatientIdentifiers(
       patientUuid
     );
@@ -114,26 +144,28 @@ export default class PatientService {
       middleName: p.MiddleName,
       lastName: p.LastName,
       dateOfBirth: p.DateOfBirth,
-      maritalStatus: p.MaritalStatus,
+      maritalStatus: "",
       gender: this.mapGender(p.Gender),
       occupation: "",
       religion: "",
       educationLevel: "",
-      country: "Kenya",
-      countryOfBirth: "Kenya",
+      country: this.mapCountry(p.Country),
+      countyOfBirth: this.mapCounty(p.CountryOfBirth),
+      originFacilityKmflCode: mflCode.mfl_code,
+      isAlive: p.IsAlive,
       residence: {
-        county: "Nairobi",
-        subCounty: "Dagorreti",
-        ward: "Ngeria",
-        village: "Ngeria",
-        landmark: "Ngeria",
-        address: "",
+        county: this.mapCounty(p.County),
+        subCounty: p.SubCounty,
+        ward: p.Ward,
+        village: p.Village,
+        landmark: p.LandMark,
+        address: p.Address,
       },
       identifications: allowedIDS,
       contact: {
         primaryPhone: p.PrimaryPhone,
         secondaryPhone: p.SecondaryPhone,
-        emailAddress: "",
+        emailAddress: p.EmailAddress,
       },
       nextOfKins: [],
     };
@@ -175,6 +207,16 @@ export default class PatientService {
     return gender[0].value;
   }
 
+  private mapCountry(c: string) {
+    const country: any = Countries.filter((co) => c == co.label.toLowerCase());
+    return country[0].value;
+  }
+
+  private mapCounty(c: string) {
+    const country: any = Counties.filter((co) => c == co.label.toLowerCase());
+    return country[0].value;
+  }
+
   private mapIDTypes(amrsId: string) {
     const idType = IdentificationTypes.filter((i) => (i.amrs = amrsId));
     return idType[0].value;
@@ -184,9 +226,9 @@ function queueClientsToRetry(patientPayload: any) {
   const producer = new Producer();
   const message = new Message();
   message
-  .setBody(JSON.stringify(patientPayload))
-  .setTTL(3600000) // in millis
-  .setQueue("cl_queue");
+    .setBody(JSON.stringify(patientPayload))
+    .setTTL(3600000) // in millis
+    .setQueue("cl_queue");
   producer.produce(message, (err) => {
     if (err) console.log(err);
     else {
@@ -211,19 +253,14 @@ function retryQueuedClients() {
     cb(); // acknowledging the message
   };
 
-  consumer.consume(
-    "cl_queue",
-    false,
-    messageHandler,
-    (err, isRunning) => {
-      if (err) console.error(err);
-      // the message handler will be started only if the consumer is running
-      else
-        console.log(
-          `Message handler has been registered. Running status: ${isRunning}`
-        ); // isRunning === false
-    }
-  );
+  consumer.consume("cl_queue", false, messageHandler, (err, isRunning) => {
+    if (err) console.error(err);
+    // the message handler will be started only if the consumer is running
+    else
+      console.log(
+        `Message handler has been registered. Running status: ${isRunning}`
+      ); // isRunning === false
+  });
 
   consumer.run();
 }
