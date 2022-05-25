@@ -7,6 +7,9 @@ import Countries from "../ClientRegistryLookupDictionaries/countries";
 import Counties from "../ClientRegistryLookupDictionaries/counties";
 import IdentificationTypes from "../ClientRegistryLookupDictionaries/identification-types";
 import { Consumer, Message, Producer } from "redis-smq";
+import Religion from "../ClientRegistryLookupDictionaries/religions";
+import MaritalStatus from "../ClientRegistryLookupDictionaries/marital-status";
+import EducationLevels from "../ClientRegistryLookupDictionaries/education-levels";
 
 export default class PatientService {
   public async searchPatientByID(params: any) {
@@ -38,8 +41,18 @@ export default class PatientService {
       method: "get",
     });
 
-    console.log("dhpResponse ", dhpResponse);
-
+    if (dhpResponse.clientExists) {
+      console.log("dhpResponse ", dhpResponse);
+      dhpResponse.client.religion = this.mapToAmrsReligion(
+        dhpResponse.client.religion
+      );
+      dhpResponse.client.maritalStatus = this.mapToAmrsMaritalStatus(
+        dhpResponse.client.maritalStatus
+      );
+      dhpResponse.client.educationLevel = this.mapToAmrsEducation(
+        dhpResponse.client.educationLevel
+      );
+    }
     return dhpResponse;
   }
 
@@ -54,6 +67,7 @@ export default class PatientService {
     );
 
     let identifiers = await getPatientIdentifiers(params.patientUuid);
+    console.log("CURRENT PATIENT ", params.patientUuid);
     let idParam = "";
     let identifier = "";
     let location = "";
@@ -102,32 +116,39 @@ export default class PatientService {
         return;
       }
 
-      /** Patient not found: Construct payload and save to Registry*/
-      let payload = await this.constructPayload(params.patientUuid, location);
+      return setTimeout(async () => {
+        /** Patient not found: Construct payload and save to Registry*/
+        let payload = await this.constructPayload(params.patientUuid, location);
 
-      httpClient.axios
-        .post("", payload)
-        .then(async (dhpResponse: any) => {
-          let savedUpi: any = await this.saveUpiNumber(
-            dhpResponse.clientNumber,
-            params.patientUuid,
-            location
-          );
-          console.log("Saved UPI, New Patient", savedUpi.identifier);
-        })
-        .catch((err: any) => {
-          // Queue Patient
-          queueClientsToRetry({
-            payload: payload,
-            patientUuid: params.patientUuid,
-            locationUuid: location,
+        httpClient.axios
+          .post("", payload)
+          .then(async (dhpResponse: any) => {
+            let savedUpi: any = await this.saveUpiNumber(
+              dhpResponse.clientNumber,
+              params.patientUuid,
+              location
+            );
+            console.log(
+              "Created successfully, assigned UPI",
+              savedUpi.identifier
+            );
+          })
+          .catch((err: any) => {
+            // Queue Patient
+            queueClientsToRetry({
+              payload: payload,
+              patientUuid: params.patientUuid,
+              locationUuid: location,
+            });
+            console.log("Error Status Code", err.response.status);
+            console.log("Post Errors ", err.response.data.errors);
+            console.log("Post Payload ", err.response.config.data);
           });
-          console.log("Error creating patient ", err);
-        });
 
-      /** TODO: Incase of error, queue patient in Redis */
+        /** TODO: Incase of error, queue patient in Redis */
 
-      return payload;
+        return payload;
+      }, 5000);
     }
   }
 
@@ -140,19 +161,25 @@ export default class PatientService {
     let allowedIDS = await this.extractAllowedIdentifiers(identifiers);
 
     const payload = {
+      clientNumber: "",
       firstName: p.FirstName,
       middleName: p.MiddleName,
       lastName: p.LastName,
       dateOfBirth: p.DateOfBirth,
-      maritalStatus: "",
+      maritalStatus: p.MaritalStatus
+        ? this.mapToDhpMaritalStatus(p.MaritalStatus)
+        : "",
       gender: this.mapGender(p.Gender),
       occupation: "",
-      religion: "",
-      educationLevel: "",
+      religion: p.Religion ? this.mapToDhpReligion(p.Religion) : "",
+      educationLevel: p.EducationLevel
+        ? this.mapToDhpEducation(p.EducationLevel)
+        : "",
       country: this.mapCountry(p.Country),
-      countyOfBirth: this.mapCounty(p.CountryOfBirth),
-      originFacilityKmflCode: mflCode.mfl_code,
+      countyOfBirth: p.CountryOfBirth ? this.mapCounty(p.CountryOfBirth) : "",
+      originFacilityKmflCode: mflCode ? mflCode.mfl_code : "15204",
       isAlive: p.IsAlive,
+      nascopCCCNumber: p.nascopCCCNumber,
       residence: {
         county: this.mapCounty(p.County),
         subCounty: p.SubCounty,
@@ -169,7 +196,6 @@ export default class PatientService {
       },
       nextOfKins: [],
     };
-
     return payload;
   }
 
@@ -203,8 +229,74 @@ export default class PatientService {
   }
 
   private mapGender(g: string) {
-    const gender: any = Gender.filter((r) => r.amrs == g);
+    const gender: any = Gender.filter((r: any) => r.amrs == g);
     return gender[0].value;
+  }
+
+  private mapToAmrsReligion(dhpR: string) {
+    if (dhpR == null || dhpR.length == 0) {
+      return;
+    }
+    const amrsRel: any = Religion.filter(
+      (r: any) => r.value == dhpR.toLocaleLowerCase()
+    );
+    if (amrsRel.length > 0) {
+      return amrsRel[0].amrs;
+    }
+  }
+
+  private mapToDhpReligion(r: string) {
+    if (r == null || r.length == 0) {
+      return;
+    }
+    const religion: any = Religion.filter((a: any) => a.amrs == r);
+    if (religion.length > 0) {
+      return religion[0].value;
+    }
+    return "";
+  }
+  private mapToAmrsEducation(dhpR: string) {
+    if (dhpR == null || dhpR.length == 0) {
+      return;
+    }
+    const educationAMrs: any = EducationLevels.filter(
+      (r: any) => r.value == dhpR
+    );
+    if (educationAMrs.length > 0) {
+      return educationAMrs[0].amrs;
+    }
+  }
+
+  private mapToDhpEducation(r: string) {
+    if (r == null || r.length == 0) {
+      return;
+    }
+    const education: any = EducationLevels.filter((e: any) => e.amrs == r);
+    if (education.length > 0) {
+      return education[0].value;
+    }
+    return "";
+  }
+
+  private mapToAmrsMaritalStatus(dhpR: string) {
+    if (dhpR == null || dhpR.length == 0) {
+      return;
+    }
+    const statusAmrs: any = MaritalStatus.filter((r: any) => r.value == dhpR);
+    if (statusAmrs.length > 0) {
+      return statusAmrs[0].amrs;
+    }
+  }
+
+  private mapToDhpMaritalStatus(r: string) {
+    if (r == null || r.length == 0) {
+      return;
+    }
+    const status: any = MaritalStatus.filter((a: any) => a.amrs == r);
+    if (status.length > 0) {
+      return status[0].value;
+    }
+    return "";
   }
 
   private mapCountry(c: string) {
@@ -213,6 +305,9 @@ export default class PatientService {
   }
 
   private mapCounty(c: string) {
+    if (c == null || c.length == 0) {
+      return;
+    }
     const country: any = Counties.filter((co) => c == co.label.toLowerCase());
     return country[0].value;
   }

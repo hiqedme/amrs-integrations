@@ -35,11 +35,11 @@ export async function getPatient(uuid: string) {
        else UPPER(t5.given_name)
   end as LastName,
   t1.birthdate as DateOfBirth,
-  null as MaritalStatus,
   t1.gender as Gender,
-  UPPER(cno.name) as Occupation,
-  null as Religion,
-  UPPER(cne.name) as EducationLevel,
+  cno.name as Occupation,
+  cnr.uuid as Religion,
+  cne.uuid as EducationLevel,
+  cnms.uuid as MaritalStatus,
   LOWER(t8.country) as Country,
   LOWER(t8.address10) as CountryOfBirth,
   LOWER(t8.address1) as County,
@@ -50,17 +50,17 @@ export async function getPatient(uuid: string) {
   t8.address8 as Address,
   t6.value AS PrimaryPhone,
   t7.value AS SecondaryPhone,
-  null as EmailAddress,
+  te.value as EmailAddress,
   UPPER(pak.value) as Name,
   UPPER(pakr.value) as Relationship,
-  null as Residence,
   case when pakp.value is not null then pakp.value else pakt.value end as PrimaryPhoneKin,
   null as SecondaryPhoneKin,
   null as EmailAddressKin,
   null as OriginFacilityKmflCode,
   case when t1.death_date is null then 'true'
        when t1.death_date is not null then 'false'
-  else null end as IsAlive
+  else null end as IsAlive,
+  case when t2.identifier is not null then t2.identifier else "" end as nascopCCCNumber
   from  amrs.person t1 
   left join amrs.patient_identifier t2 on (t1.person_id = t2.patient_id and t2.identifier_type = 28 and t2.voided = 0)
   left join amrs.patient_identifier t3 on (t1.person_id = t3.patient_id and t3.identifier_type = 5 and t3.voided = 0)
@@ -68,11 +68,16 @@ export async function getPatient(uuid: string) {
   left join amrs.person_name t5 on (t5.person_id = t1.person_id and t5.voided = 0)
   left join amrs.person_attribute t6 ON (t1.person_id = t6.person_id AND t6.voided = 0 AND t6.person_attribute_type_id IN (10))
   left join amrs.person_attribute t7 ON (t1.person_id = t7.person_id AND t7.voided = 0 AND t7.person_attribute_type_id IN (40))
+   left join amrs.person_attribute te ON (t1.person_id = te.person_id AND te.voided = 0 AND te.person_attribute_type_id IN (60))
   left join (select * from amrs.person_address where person_id = ${personIdVal} order by date_created desc limit 1 ) t8 on (t1.person_id = t8.person_id and t8.voided = 0)
   left join amrs.person_attribute pao on (pao.person_id = t1.person_id and pao.person_attribute_type_id = 42 and pao.voided = 0) #occupation
   left join amrs.concept_name cno on (cno.concept_id = pao.value and cno.voided = 0)
+  left join amrs.person_attribute par on (par.person_id = t1.person_id and par.person_attribute_type_id = 49 and par.voided = 0) #religion
+  left join amrs.concept cnr on (cnr.concept_id = par.value and cnr.retired = 0)
+  left join amrs.person_attribute pams on (pams.person_id = t1.person_id and pams.person_attribute_type_id = 5 and pams.voided = 0) #marital status
+  left join amrs.concept cnms on (cnms.concept_id = pams.value and cnms.retired = 0)
   left join amrs.person_attribute pae on (pae.person_id = t1.person_id and pae.person_attribute_type_id = 73 and pae.voided = 0) #highest education
-  left join amrs.concept_name cne on (cne.concept_id = pae.value and cne.voided = 0)
+  left join amrs.concept cne on (cne.concept_id = pae.value and cne.retired = 0)
   left join amrs.person_attribute pasp on (pasp.person_id = t1.person_id and pasp.person_attribute_type_id = 23 and pasp.voided = 0) #partner phone
   left join amrs.person_attribute pak on (pak.person_id = t1.person_id and pak.person_attribute_type_id = 69 and pak.voided = 0) #caregiver name
   left join amrs.person_attribute pakr on (pakr.person_id = t1.person_id and pakr.person_attribute_type_id = 70 and pakr.voided = 0) #relationship
