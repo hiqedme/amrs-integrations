@@ -2,37 +2,75 @@ import config from "@amrs-integrations/core";
 
 export async function getFacilityMfl(param: string) {
   let CM = config.ConnectionManager.getInstance();
-  let amrsCON = await CM.getConnectionAmrs();
+  let amrsCON: any;
   let sql = `select mfl_code from amrs.location
-     left join ndwr.mfl_codes using(location_id)
-     where uuid = '${param}';`;
-  const result = await CM.query(sql, amrsCON);
-  return result[0];
+  left join ndwr.mfl_codes using(location_id)
+  where uuid = '${param}';`;
+  return CM.getConnectionAmrs()
+    .then((con) => {
+      amrsCON = con;
+      return CM.query(sql, amrsCON)
+        .then((r) => {
+          console.log("MFL PAYLOAD QUERY RESULT ", r[0]);
+          return r[0];
+        })
+        .catch((err) => console.log("MFL Database Query Error ", err));
+    })
+    .catch((err) => {
+      console.log("MFL Database Connection Error ", err);
+    });
 }
 
 async function getPerson_id(uuid: string) {
   let CM = config.ConnectionManager.getInstance();
-  let amrsCON = await CM.getConnectionAmrs();
+  let amrsCON: any;
   let sql = `select * from amrs.person where uuid = '${uuid}';`;
-  const result = await CM.query(sql, amrsCON);
-  return result[0];
+  return CM.getConnectionAmrsProd()
+    .then((con) => {
+      amrsCON = con;
+      return CM.query(sql, amrsCON)
+        .then((r) => {
+          return r[0];
+        })
+        .catch((err) => console.log("Database Query Error ", err));
+    })
+    .catch((err) => {
+      console.log("Database Connection Error ", err);
+    });
 }
 
 export async function getPatient(uuid: string) {
   const person_id = await getPerson_id(uuid);
   const personIdVal = person_id.person_id;
   let CM = config.ConnectionManager.getInstance();
-  let amrsCON = await CM.getConnectionAmrs();
-  let sql = `select t1.uuid,
+  let amrsCON: any;
+  const sql = patientQuery(personIdVal, uuid);
+  return CM.getConnectionAmrsProd()
+    .then((con) => {
+      amrsCON = con;
+      return CM.query(sql, amrsCON)
+        .then((r) => {
+          console.log("PAYLOAD QUERY RESULT ", r[0]);
+          return r[0];
+        })
+        .catch((err) => console.log("Database Query Error ", err));
+    })
+    .catch((err) => {
+      console.log("Database Connection Error ", err);
+    });
+}
+
+function patientQuery(personIdVal: Number, uuid: string) {
+  return `select t1.uuid,
   null as ClientNumber,
   case when t5.given_name is not null then UPPER(t5.given_name)
-       when t5.middle_name is not null then UPPER(t5.middle_name)
-       else UPPER(t5.family_name)
+      when t5.middle_name is not null then UPPER(t5.middle_name)
+      else UPPER(t5.family_name)
   end as FirstName,
   UPPER(t5.middle_name) as MiddleName,
   case when t5.family_name is not null then UPPER(t5.family_name)
-       when t5.middle_name is not null then UPPER(t5.middle_name)
-       else UPPER(t5.given_name)
+      when t5.middle_name is not null then UPPER(t5.middle_name)
+      else UPPER(t5.given_name)
   end as LastName,
   t1.birthdate as DateOfBirth,
   t1.gender as Gender,
@@ -58,17 +96,17 @@ export async function getPatient(uuid: string) {
   null as EmailAddressKin,
   null as OriginFacilityKmflCode,
   case when t1.death_date is null then 'true'
-       when t1.death_date is not null then 'false'
+      when t1.death_date is not null then 'false'
   else null end as IsAlive,
   case when t2.identifier is not null then t2.identifier else "" end as nascopCCCNumber
-  from  amrs.person t1 
+  from  amrs.person t1
   left join amrs.patient_identifier t2 on (t1.person_id = t2.patient_id and t2.identifier_type = 28 and t2.voided = 0)
   left join amrs.patient_identifier t3 on (t1.person_id = t3.patient_id and t3.identifier_type = 5 and t3.voided = 0)
   left join amrs.patient_identifier t4 on (t1.person_id = t4.patient_id and t4.identifier_type = 3 and t4.voided = 0)
   left join amrs.person_name t5 on (t5.person_id = t1.person_id and t5.voided = 0)
   left join amrs.person_attribute t6 ON (t1.person_id = t6.person_id AND t6.voided = 0 AND t6.person_attribute_type_id IN (10))
   left join amrs.person_attribute t7 ON (t1.person_id = t7.person_id AND t7.voided = 0 AND t7.person_attribute_type_id IN (40))
-   left join amrs.person_attribute te ON (t1.person_id = te.person_id AND te.voided = 0 AND te.person_attribute_type_id IN (60))
+  left join amrs.person_attribute te ON (t1.person_id = te.person_id AND te.voided = 0 AND te.person_attribute_type_id IN (60))
   left join (select * from amrs.person_address where person_id = ${personIdVal} order by date_created desc limit 1 ) t8 on (t1.person_id = t8.person_id and t8.voided = 0)
   left join amrs.person_attribute pao on (pao.person_id = t1.person_id and pao.person_attribute_type_id = 42 and pao.voided = 0) #occupation
   left join amrs.concept_name cno on (cno.concept_id = pao.value and cno.voided = 0)
@@ -84,8 +122,4 @@ export async function getPatient(uuid: string) {
   left join amrs.person_attribute pakt on (pakt.person_id = t1.person_id and pakt.person_attribute_type_id = 25 and pakt.voided = 0) #Kin phone
   left join amrs.person_attribute pakp on (pakp.person_id = t1.person_id and pakp.person_attribute_type_id = 71 and pakp.voided = 0)
     where t1.uuid = '${uuid}' group by t1.person_id`;
-
-  const result = await CM.query(sql, amrsCON);
-
-  return result[0];
 }

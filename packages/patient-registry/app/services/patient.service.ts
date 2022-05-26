@@ -94,7 +94,14 @@ export default class PatientService {
       }
     });
 
-    console.log("search params ", idParam, identifier, location);
+    console.log(
+      "ID val ",
+      idParam,
+      "ID type ",
+      identifier,
+      "ID location ",
+      location
+    );
 
     if (idParam.length != 0) {
       const url = `/search/${idParam}/${identifier}`;
@@ -105,8 +112,6 @@ export default class PatientService {
 
       console.log("Does client exist in registry ", dhpResponse.clientExists);
       if (dhpResponse.clientExists) {
-        console.log("DHP client number", dhpResponse.client.clientNumber);
-
         let savedUpi = await this.saveUpiNumber(
           dhpResponse.client.clientNumber,
           params.patientUuid,
@@ -116,39 +121,37 @@ export default class PatientService {
         return;
       }
 
-      return setTimeout(async () => {
-        /** Patient not found: Construct payload and save to Registry*/
-        let payload = await this.constructPayload(params.patientUuid, location);
+      /** Patient not found: Construct payload and save to Registry*/
+      let payload = await this.constructPayload(params.patientUuid, location);
 
-        httpClient.axios
-          .post("", payload)
-          .then(async (dhpResponse: any) => {
-            let savedUpi: any = await this.saveUpiNumber(
-              dhpResponse.clientNumber,
-              params.patientUuid,
-              location
-            );
-            console.log(
-              "Created successfully, assigned UPI",
-              savedUpi.identifier
-            );
-          })
-          .catch((err: any) => {
-            // Queue Patient
-            queueClientsToRetry({
-              payload: payload,
-              patientUuid: params.patientUuid,
-              locationUuid: location,
-            });
-            console.log("Error Status Code", err.response.status);
-            console.log("Post Errors ", err.response.data.errors);
-            console.log("Post Payload ", err.response.config.data);
+      httpClient.axios
+        .post("", payload)
+        .then(async (dhpResponse: any) => {
+          let savedUpi: any = await this.saveUpiNumber(
+            dhpResponse.clientNumber,
+            params.patientUuid,
+            location
+          );
+          console.log(
+            "Created successfully, assigned UPI",
+            savedUpi.identifier
+          );
+        })
+        .catch((err: any) => {
+          console.log("Error Status Code", err.response.status);
+          console.log("Post Errors ", err.response.data.errors);
+          console.log("Post Payload ", err.response.config.data);
+          // Queue Patient
+          queueClientsToRetry({
+            payload: payload,
+            patientUuid: params.patientUuid,
+            locationUuid: location,
           });
+        });
 
-        /** TODO: Incase of error, queue patient in Redis */
+      /** TODO: Incase of error, queue patient in Redis */
 
-        return payload;
-      }, 5000);
+      return payload;
     }
   }
 
