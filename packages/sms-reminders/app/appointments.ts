@@ -19,33 +19,50 @@ export async function RetrieveAppointments(
     .add(daysBeforeRTC, "days")
     .format("YYYY-MM-DD");
   if (messageType === "welcome" || messageType === "optout") {
-    //Retrieve clients who have consented and never received a welcome message;
-    let clients = await getConsentedAndOptedoutClients();
-    //await QueueAppointments(clients,messageType)
+    //Retrieve clients who have consented and never received a welcome message in the last 5 minutes;
+    let last5 = moment().subtract(5, "minutes").format("YYYY-MM-DD HH:mm:ss");
+    let clients = await getConsentedAndOptedoutClients(last5);
+    await QueueAppointments(clients, messageType);
   } else if (messageType === "congratulations") {
-    let honouredAppointments = await getHonoredAppointments();
+    //Retrieve clients who have honored appointments in the last hour;
+    let lastHour = moment().subtract(1, "hour").format("YYYY-MM-DD HH:mm:ss");
+    let honouredAppointments = await getHonoredAppointments(
+      moment().format("YYYY-MM-DD"),
+      lastHour
+    );
+    await QueueAppointments(honouredAppointments, messageType);
   } else if (messageType === "missed") {
-    let missedAppointments = await getMissedAppointments();
+    let yesterday = moment().subtract(1, "day").format("YYYY-MM-DD");
+    let missedAppointments = await getMissedAppointments(yesterday);
+    await QueueAppointments(missedAppointments, messageType);
   } else {
     let appointments = await dailyAppointmentsquery(appointmentDate);
-    //await QueueAppointments(appointments,messageType);
+    await QueueAppointments(appointments, messageType);
   }
 }
 
-export async function QueueAppointments(patients: Patient[],messageType:string) {
+export async function QueueAppointments(
+  patients: Patient[],
+  messageType: string
+) {
   let count = 0;
+  if(patients.length != 0){
   const producer = new Producer();
   patients.forEach(async (element) => {
     const message = new Message();
     // get consent
     let consent = await GetPatientConsent(element.uuid);
-    if (consent[0] !== "" || messageType === "optout") {
+    if (consent[0] !== "") {
+      count++;
+      //|| messageType === "optout" TODO
       element.timeToSend =
-        moment().format("YYYY-MM-DD") +
-        " " +
-        moment(consent[0]).format("HH:mm");
-      element.language = consent[1]
-      element.messageType = messageType
+        messageType === "optout" || "welcome" || "sameday"
+          ? ""
+          : moment().format("YYYY-MM-DD") +
+            " " +
+            moment(consent[0]).format("HH:mm");
+      element.language = consent[1];
+      element.messageType = messageType;
       message
         .setBody(JSON.stringify(element))
         .setTTL(3600000) // in millis
@@ -55,17 +72,22 @@ export async function QueueAppointments(patients: Patient[],messageType:string) 
         if (err) console.log(err);
         else {
           const msgId = message.getId(); // string
-          console.log("Successfully produced. Message ID is ", msgId);
-          count++;
+          console.log("Successfully produced. Message ID is ", msgId,element.person_name,consent);
         }
       });
+    } else {
+      count++
+      console.log(element.person_name + " not consented ",patients.length,count);
+    }
+    console.log(element.person_name + " not consented ",patients.length,count);
+     // if all appointments were queued successfuly, shutdown producer and exit with code 0
+     if (count == patients.length) {
+      producer.shutdown(process.exit(0));
     }
   });
-  // if all appointments were queued successfuly, shutdown producer and exit with code 0
-  if (count === patients.length) {
-    producer.shutdown();
-    process.exit(0);
-  }
+}else{
+  process.exit(0);
+}
 }
 
 export async function SendNotifications() {
@@ -108,6 +130,7 @@ export async function GetPatientConsent(patientUUID: string) {
   );
   let consentedTime = "";
   let consentedLanguage = "";
+  let consentResult="";
   let consent: any = await httpClient.axios(
     "/ws/rest/v1/obs?" +
       qs.stringify({
@@ -122,7 +145,7 @@ export async function GetPatientConsent(patientUUID: string) {
   );
   if (
     consent.results.length > 0 &&
-    consent.results[0].value.display === "YES"
+    consent.results[0]?.value?.display === "YES"
   ) {
     let smsTimeandLanguage = await httpClient.axios(
       "/ws/rest/v1/obs?" +
@@ -139,14 +162,14 @@ export async function GetPatientConsent(patientUUID: string) {
     consentedTime = smsTimeandLanguage.results.find(
       (x: { concept: { uuid: string } }) =>
         x.concept.uuid === "4e1a9d59-3d06-47eb-82a7-30410db249e4"
-    ).value;
+    )?.value;
     consentedLanguage =
       smsTimeandLanguage.results.find(
         (x: { concept: { uuid: string } }) =>
           x.concept.uuid === "a89e54e8-1350-11df-a1f1-0026b9348838"
-      ).value.display === "ENGLISH"
-        ? "english"
-        : "kiswahili";
+      )?.value?.display === "SWAHILI"
+        ? "kiswahili"
+        : "english";
   }
   return [consentedTime,consentedLanguage];
 }

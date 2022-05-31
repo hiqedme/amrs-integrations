@@ -13,27 +13,28 @@ export async function SendSMS(params: any) {
   if (isValidPhoneNumber(smsParams.phone_number, "KE")) {
     const phoneNumber = parsePhoneNumber(smsParams.phone_number, "KE");
     let numberExist: any[] = await checkNumber(phoneNumber.number);
+    console.log(numberExist);
     if (
       (smsParams.messageType === "welcome" &&
         numberExist.length > 0 &&
         numberExist[0].status === "active") ||
       (smsParams.messageType === "optout" &&
         numberExist.length > 0 &&
-        numberExist[0].status === "optedout") ||(smsParams.messageType === "optout" &&
-        numberExist.length !> 0)
+        numberExist[0].status === "optedout") ||
+      (smsParams.messageType === "optout" && numberExist.length! > 0)
     ) {
       return;
     } else if (
       (smsParams.messageType === "optout" &&
         numberExist.length > 0 &&
         numberExist[0].status === "active") ||
-      (smsParams.messageType === "welcome" && !numberExist) ||
+      (smsParams.messageType === "welcome" && numberExist.length == 0) ||
       (smsParams.messageType === "welcome" &&
         numberExist.length > 0 &&
         numberExist[0].status === "optedout")
     ) {
       let status = smsParams.messageType === "optout" ? "optedout" : "active";
-      saveNumber(phoneNumber.number, status,numberExist.length > 0);
+      saveNumber(phoneNumber.number, status, numberExist.length > 0);
     }
     let appointmentDate = moment(smsParams.rtc_date).format("YYYY-MM-DD");
     let sms = "";
@@ -43,11 +44,13 @@ export async function SendSMS(params: any) {
         dictionary.templates.find(
           (x: { type: string }) => x.type === smsParams.messageType
         )?.english || "";
+        console.log('sending message',smsParams.messageType,sms)
     } else {
       sms =
         dictionary.templates.find(
           (x: { type: string }) => x.type === smsParams.messageType
         )?.kiswahili || "";
+        console.log('sending message',smsParams.messageType,sms)
     }
     let httpClient = new config.HTTPInterceptor(
       config.sms.url || "",
@@ -74,6 +77,7 @@ export async function SendSMS(params: any) {
           }),
         }
       );
+      console.log('Message sent:',sendSMSResponse)
       return sendSMSResponse;
     } else {
       console.log("Invalid phone number");
