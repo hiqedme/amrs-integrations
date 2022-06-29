@@ -138,7 +138,10 @@ export default class PatientService {
           );
         })
         .catch((err: any) => {
-          console.log("Error Status Code", err.response.status);
+          console.log(
+            "Error Status Code",
+            err.response ? err.response.status : ""
+          );
           console.log("Post Errors ", err.response.data.errors);
           console.log("Post Payload ", err.response.config.data);
           // Queue Patient
