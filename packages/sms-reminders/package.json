@@ -11,7 +11,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@amrs-integrations/core": "^0.1.0-alpha.12",
+    "@amrs-integrations/core": "^0.1.0-alpha.14",
     "libphonenumber-js": "^1.9.51"
   },
   "gitHead": "197b6e670dfedc033a3e16ac280fbb11eef08cc9",

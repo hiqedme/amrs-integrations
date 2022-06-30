@@ -11,7 +11,7 @@
         },{
             "type":"1day",
             "english":"Hallo $personName$, kindly remember your appointment is due TOMORROW $rtc_date$. Your Health is our happiness!",
-            "kiswahili":"Hujambo $personName$? Unaombwa uje kwa miadi yako KESHO  $rtc_date$. Afya Yako Ni Furaha Yetu"
+            "kiswahili":"Hujambo $personName$? Unaombwa uje kwa miadi yako KESHO $rtc_date$. Afya Yako Ni Furaha Yetu"
         },
         {
             "type":"sameday",
@@ -19,13 +19,13 @@
             "kiswahili":"Hujambo $personName$? Unaombwa uje kwa miadi yako LEO $rtc_date$. Afya Yako Ni Furaha Yetu"
         },
         {
-            "type":"tcahonored",
-            "english":"Hallo $personName$, thank you for keeping your appointment. We look forward to serving you again on date.Your Health is our Happiness!",
-            "kiswahili":"Hujambo $personName$? Tunashukuru kwa kufika kwako. Tunatarajia kukuhudumia tena siku na tarehe.Afya yako ni Furaha Yetu! "
+            "type":"congratulations",
+            "english":"Hallo $personName$, thank you for keeping your appointment. We look forward to serving you again on $rtc_date$.Your Health is our Happiness!",
+            "kiswahili":"Hujambo $personName$? Tunashukuru kwa kufika kwako. Tunatarajia kukuhudumia tena $rtc_date$.Afya yako ni Furaha Yetu! "
         },
         {
-            "type":"tcamissed",
-            "english":"How are you $personName$? Your appointment was due yesterday and date. Kindly make an effort to visit us as soon as possible.Incase of any concerns reach us on this number 0800720260.Afya yako ni Furaha Yetu!",
+            "type":"missed",
+            "english":"Hallo $personName$? Your appointment was due yesterday. Kindly make an effort to visit us as soon. In case of any concerns reach us on this number 0800720260.Afya yako ni Furaha Yetu!",
             "kiswahili":"Hujambo $personName$.Je,waendeleaje?Ulikosa Miadi yako jana.Tafadhali jaribu kututembelea haraka iwezekanavyo.Ikiwa kuna jambo lolote,piga simu kwa nambari 0800720260"
         },
         {

@@ -8,13 +8,20 @@ setConfiguration(redisConfig)
 let args = process.argv;
 switch (args[2]) {
     case 'produce':
-        RetrieveAppointments(args[3],"","")
+        // Week before, a day before,morning of appointment, 24hrs after missing/honouring appointment
+        // All people who honoured appointments get congratulatory messages after 1hr
+        // Monitoring delivery reports and replies from shortcode. 
+        // Morning meessage to go at 6 for all appointments client
+        // Every one who has consented gets a welcome message immediately
+        RetrieveAppointments(args[3],"",args[4])
+        // Every one who has consented gets a welcome message.
+        // Send to completed visits
         break;
     case 'consume':
         SendNotifications();
         break;
     case 'test':
-        SendSMS('{"rtc_date":"2022-09-10","phone_number":"'+args[3]+'","timeToSend":"2022-04-27 15:15:00"}');
+        SendSMS('{"rtc_date":"2022-09-10","phone_number":"'+args[3]+'","timeToSend":"2022-04-27 15:15:00","language":"english","messageType":"optout","person_name":"Rono"}');
         break;
     default:
         console.log("please specify the command to run e.g node index.js produce 4")

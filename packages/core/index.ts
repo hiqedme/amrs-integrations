@@ -67,7 +67,7 @@ export default {
     logger: {
         enabled: true,
         options: {
-            level: 'info',
+            level: 'debug',
             /*
             streams: [
                 {
@@ -79,11 +79,11 @@ export default {
     },
     monitor: {
         enabled: true,
-        host: '127.0.0.1',
+        host: '0.0.0.0',
         port: 3333,
     },
     message: {
-        consumeTimeout: 60000,
+        consumeTimeout:600000,
         retryThreshold: 5,
         retryDelay: 60000,
         ttl: 120000,
