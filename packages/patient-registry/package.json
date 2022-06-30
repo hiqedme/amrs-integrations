@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@amrs-integrations/core": "^0.1.0-alpha.12",
+    "@amrs-integrations/core": "^0.1.0-alpha.15",
     "@hapi/hapi": "20.2.2"
   },
   "publishConfig": {
