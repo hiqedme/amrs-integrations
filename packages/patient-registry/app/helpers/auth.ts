@@ -35,8 +35,6 @@ export default async function getAccessToken() {
 
 export async function validateToken() {
   let isValid = false;
-  // TODO: Remove in production
-  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
   try {
     const data = fs.readFileSync(config.accessToken || "token.txt", "utf8");
     if (data !== "") {

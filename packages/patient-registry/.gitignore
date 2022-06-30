@@ -107,3 +107,4 @@ build/
 
 /app/poc_sample_payload.ts
 /app/sample_data.ts
+token.txt

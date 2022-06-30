@@ -19,6 +19,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/hapi__hapi": "^20.0.10"
+    "@types/hapi__hapi": "^20.0.12"
   }
 }
