@@ -183,7 +183,7 @@ export default class PatientService {
         : "",
       country: this.mapCountry(p.Country),
       countyOfBirth: p.CountryOfBirth ? this.mapCounty(p.CountryOfBirth) : "",
-      originFacilityKmflCode: mflCode ? mflCode.mfl_code : "15204",
+      originFacilityKmflCode: mflCode.mfl_code ? mflCode.mfl_code : "15204",
       isAlive: p.IsAlive,
       nascopCCCNumber: p.nascopCCCNumber,
       residence: {
