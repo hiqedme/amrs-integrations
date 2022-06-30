@@ -1,9 +1,13 @@
 import config from "@amrs-integrations/core";
 
+function getConnectionManager() {
+  return config.ConnectionManager.getInstance();
+}
+
 export async function getFacilityMfl(param: string) {
-  let CM = config.ConnectionManager.getInstance();
+  const CM = getConnectionManager();
   let amrsCON: any;
-  let sql = `select mfl_code from amrs.location
+  const sql = `select mfl_code from amrs.location
   left join ndwr.mfl_codes using(location_id)
   where uuid = '${param}';`;
   return CM.getConnectionAmrs()
@@ -14,7 +18,8 @@ export async function getFacilityMfl(param: string) {
           console.log("MFL PAYLOAD QUERY RESULT ", r[0]);
           return r[0];
         })
-        .catch((err) => console.log("MFL Database Query Error ", err));
+        .catch((err) => console.log("MFL Database Query Error ", err))
+        .finally(() => CM.releaseConnections(amrsCON));
     })
     .catch((err) => {
       console.log("MFL Database Connection Error ", err);
@@ -22,9 +27,9 @@ export async function getFacilityMfl(param: string) {
 }
 
 async function getPerson_id(uuid: string) {
-  let CM = config.ConnectionManager.getInstance();
+  const CM = getConnectionManager();
   let amrsCON: any;
-  let sql = `select * from amrs.person where uuid = '${uuid}';`;
+  const sql = `select * from amrs.person where uuid = '${uuid}';`;
   return CM.getConnectionAmrsProd()
     .then((con) => {
       amrsCON = con;
@@ -32,7 +37,8 @@ async function getPerson_id(uuid: string) {
         .then((r) => {
           return r[0];
         })
-        .catch((err) => console.log("Database Query Error ", err));
+        .catch((err) => console.log("Database Query Error ", err))
+        .finally(() => CM.releaseConnections(amrsCON));
     })
     .catch((err) => {
       console.log("Database Connection Error ", err);
@@ -42,7 +48,7 @@ async function getPerson_id(uuid: string) {
 export async function getPatient(uuid: string) {
   const person_id = await getPerson_id(uuid);
   const personIdVal = person_id.person_id;
-  let CM = config.ConnectionManager.getInstance();
+  const CM = getConnectionManager();
   let amrsCON: any;
   const sql = patientQuery(personIdVal, uuid);
   return CM.getConnectionAmrsProd()
@@ -53,7 +59,8 @@ export async function getPatient(uuid: string) {
           console.log("PAYLOAD QUERY RESULT ", r[0]);
           return r[0];
         })
-        .catch((err) => console.log("Database Query Error ", err));
+        .catch((err) => console.log("Database Query Error ", err))
+        .finally(() => CM.releaseConnections(amrsCON));
     })
     .catch((err) => {
       console.log("Database Connection Error ", err);
