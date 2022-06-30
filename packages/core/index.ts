@@ -8,6 +8,7 @@ if (envFound.error) {
   throw new Error("⚠️  Couldn't find .env file  ⚠️");
 }
 export default {
+  devPort:process.env.devPort,
   databaseURL: process.env.mysqlHost,
   user: process.env.user,
   password: process.env.password,
@@ -17,7 +18,8 @@ export default {
   amrsUsername: process.env.amrsUsername,
   amrsPassword: process.env.amrsPassword,
   connectionLimit: process.env.connectionLimit,
-  server: process.env.server,
+  server: process.env.devServer,
+  accessToken: process.env.accessToken,
   adt: {
     username: process.env.amrsUsername,
     password: process.env.amrsPassword,
@@ -87,6 +89,14 @@ export default {
         ttl: 120000,
     },
     storeMessages: false,
+},
+dhp:{
+  clientId:process.env.dhpClientID,
+  clientSecret:process.env.dhpClientSecret,
+  grantType:process.env.dhpGrantType,
+  scope:process.env.dhpScope,
+  url:process.env.dhpURL,
+  authUrl:process.env.dhpTokenURL
 }
 };
 

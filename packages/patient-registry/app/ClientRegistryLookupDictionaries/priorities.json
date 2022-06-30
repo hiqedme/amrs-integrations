@@ -1,0 +1,10 @@
+[
+  {
+    "value": "emergency",
+    "label": "Emergency"
+  },
+  {
+    "value": "normal",
+    "label": "Normal"
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "name": "@amrs-integrations/patient-registry",
+  "version": "0.1.0-alpha.0",
+  "description": "Central registry service",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node ./dist/app.js",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@amrs-integrations/core": "^0.1.0-alpha.12",
+    "@hapi/hapi": "20.2.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/hapi__hapi": "^20.0.12"
+  }
+}
