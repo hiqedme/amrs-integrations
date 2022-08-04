@@ -354,6 +354,24 @@ const Counties = [
         ],
       },
       {
+        value: 'webuye-east',
+        label: 'Webuye East',
+        children: [
+          {
+            value: 'mihuu',
+            label: 'Mihuu'
+          },
+          {
+            value: 'maraka',
+            label: 'Maraka'
+          },
+          {
+            value: 'ndivisi',
+            label: 'Ndivisi'
+          }
+        ]
+      },
+      {
         value: "webuye-west",
         label: "Webuye West",
         children: [
