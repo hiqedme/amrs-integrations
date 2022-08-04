@@ -168,37 +168,37 @@ export default class PatientService {
 
     const payload = {
       clientNumber: "",
-      firstName: p.FirstName,
-      middleName: p.MiddleName,
-      lastName: p.LastName,
-      dateOfBirth: p.DateOfBirth,
+      firstName: p.FirstName ? p.FirstName : "",
+      middleName: p.MiddleName ? p.MiddleName : "",
+      lastName: p.LastName ? p.LastName : "",
+      dateOfBirth: p.DateOfBirth ? p.DateOfBirth : "",
       maritalStatus: p.MaritalStatus
         ? this.mapToDhpMaritalStatus(p.MaritalStatus)
         : "",
-      gender: this.mapGender(p.Gender),
+      gender: p.Gender ? this.mapGender(p.Gender) : "",
       occupation: "",
       religion: p.Religion ? this.mapToDhpReligion(p.Religion) : "",
       educationLevel: p.EducationLevel
         ? this.mapToDhpEducation(p.EducationLevel)
         : "",
-      country: this.mapCountry(p.Country),
+      country: p.Country ? this.mapCountry(p.Country) : "",
       countyOfBirth: p.CountryOfBirth ? this.mapCounty(p.CountryOfBirth) : "",
       originFacilityKmflCode: mflCode.mfl_code ? mflCode.mfl_code : "15204",
       isAlive: p.IsAlive,
-      nascopCCCNumber: p.nascopCCCNumber,
+      nascopCCCNumber: p.nascopCCCNumber ? p.nascopCCCNumber : "",
       residence: {
-        county: this.mapCounty(p.County),
-        subCounty: p.SubCounty,
-        ward: p.Ward,
-        village: p.Village,
-        landmark: p.LandMark,
-        address: p.Address,
+        county: p.County ? this.mapCounty(p.County) : "",
+        subCounty: p.SubCounty ? p.SubCounty : "",
+        ward: p.Ward ? p.Ward : "",
+        village: p.Village ? p.Village : "",
+        landmark: p.LandMark ? p.LandMark : "",
+        address: p.Address ? p.Address : "",
       },
       identifications: allowedIDS,
       contact: {
-        primaryPhone: p.PrimaryPhone,
-        secondaryPhone: p.SecondaryPhone,
-        emailAddress: p.EmailAddress,
+        primaryPhone: p.PrimaryPhone ? p.PrimaryPhone : "",
+        secondaryPhone: p.SecondaryPhone ? p.SecondaryPhone : "",
+        emailAddress: p.EmailAddress ? p.EmailAddress : "",
       },
       nextOfKins: [],
     };
