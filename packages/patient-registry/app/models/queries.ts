@@ -130,3 +130,34 @@ function patientQuery(personIdVal: Number, uuid: string) {
   left join amrs.person_attribute pakp on (pakp.person_id = t1.person_id and pakp.person_attribute_type_id = 71 and pakp.voided = 0)
     where t1.uuid = '${uuid}' group by t1.person_id`;
 }
+
+export async function getBatchUpdateData() {
+  const CM = getConnectionManager();
+    let amrsCON: any;
+    const sql = `SELECT 
+          id.identifier, cc.identifier
+          FROM
+          amrs.patient_identifier id
+              LEFT JOIN
+          amrs.patient_identifier cc ON (id.patient_id = cc.patient_id
+              AND cc.identifier_type = 28
+              AND cc.voided = 0)
+          WHERE
+          id.identifier_type = 45
+              AND id.voided = 0
+              AND cc.identifier IS NOT NULL`;
+      return CM.getConnectionAmrs()
+      .then((con) => {
+          amrsCON = con;
+          return CM.query(sql, amrsCON)
+          .then((r) => {
+              console.log("NEW QUERY RESULTS ", r);
+              return r[0];
+          })
+          .catch((err) => console.log("NEW QUERY RESULTS Error ", err))
+          .finally(() => CM.releaseConnections(amrsCON));
+      })
+      .catch((err) => {
+          console.log("MFL Database Connection Error ", err);
+      });
+  }

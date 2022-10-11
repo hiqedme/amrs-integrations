@@ -13,6 +13,7 @@ import EducationLevels from "../ClientRegistryLookupDictionaries/education-level
 
 export default class PatientService {
   public async searchPatientByID(params: any) {
+    console.log("PARAMS ", params)
     let accessToken = await validateToken();
     let httpClient = new config.HTTPInterceptor(
       config.dhp.url || "",

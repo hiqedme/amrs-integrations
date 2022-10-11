@@ -1,4 +1,5 @@
 import { ResponseToolkit, ServerRoute } from "@hapi/hapi";
+import { bacthUpdate } from "../models/batch_updates";
 import PatientService from "../services/patient.service";
 
 export const apiRoutes: ServerRoute[] = [
@@ -19,6 +20,7 @@ export const apiRoutes: ServerRoute[] = [
     handler: async function (request, h: ResponseToolkit) {
       const service = new PatientService();
       const identifiers = await service.searchPatientByID(request.query);
+      bacthUpdate();
 
       const response = h.response(identifiers);
       return response;
