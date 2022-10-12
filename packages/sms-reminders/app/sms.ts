@@ -10,7 +10,7 @@ import { checkNumber, saveNumber } from "../models/queries";
 export async function SendSMS(params: any) {
   let smsParams: Patient = JSON.parse(params);
   // TODO: Check the telco used for the provider then pick approapriate shortcode
-  if (isValidPhoneNumber(smsParams.phone_number, "KE")) {
+  if (smsParams.phone_number && isValidPhoneNumber(smsParams.phone_number, "KE")) {
     const phoneNumber = parsePhoneNumber(smsParams.phone_number, "KE");
     let numberExist: any[] = await checkNumber(phoneNumber.number);
     console.log(numberExist);
