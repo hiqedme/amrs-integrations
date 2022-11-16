@@ -15,7 +15,7 @@ export async function dailyAppointmentsquery(appointmentDate: string) {
     appointmentDate +
     "') AND fhs.next_clinical_datetime_hiv is null AND (t3.program_id IN (1, 4, 2, 11, 10, 19, 30, 9, 8, 3, 20, 25, 27, 28, 29, 31) OR t3.program_id IS NULL) AND (t2.encounter_type NOT IN (21, 99999)) AND (((t2.next_encounter_type <> 116 OR t2.next_encounter_type IS NULL ) OR t2.scheduled_date >= t2.next_encounter_datetime)) AND (t2.is_clinical = 1) AND (t2.is_clinical = 1) AND (fhs.transfer_out_location_id IS NULL OR fhs.transfer_out_location_id <> 9999) AND ((death_reporting.encounter_datetime IS NULL) OR (DATE(t2.scheduled_date) < DATE(death_reporting.encounter_datetime))) AND (1 = (IF(DATE_FORMAT(t2.scheduled_date, '%Y-%m-%d') = '" +
     appointmentDate +
-    "', 1, NULL))) and t2.location_id in ('4','140','60','102','147','58','218','208','69','62','196','84','72','77','71','206','198','197','186','1','13','14','15','200','199','204','202','201','207','223','70','54','153','73','148','3','217','31','28','211','203','324','330','333','326','325','327','332','328','329','331','11','229','17','227','94','214') GROUP BY t1.person_id";
+    "', 1, NULL))) GROUP BY t1.person_id";
   console.log("Query", sql);
   let result: Patient[] = await CM.query(sql, amrsCON);
   await CM.releaseConnections(amrsCON)
@@ -54,7 +54,6 @@ export async function getConsentedAndOptedoutClients(
                 contacts.value IS NOT NULL
                     AND (t2.encounter_type IN (213)) and t2.encounter_datetime > "${encounterDateTime}"
                     AND (death_reporting.encounter_datetime IS NULL)
-                    AND  t2.location_id IN ('4','140','60','102','147','58','218','208','69','62','196','84','72','77','71','206','198','197','186','1','13','14','15','200','199','204','202','201','207','223','70','54','153','73','148','3','217','31','28','211','203','324','330','333','326','325','327','332','328','329','331','11','229','17','227','94','214')
               GROUP BY t1.person_id;`;
               console.log(sql);
   let result: Patient[] = await CM.query(sql, amrsCON);
@@ -101,7 +100,6 @@ export async function getHonoredAppointments(
               amrs.visit_type vt ON (t2.visit_type_id = vt.visit_type_id)
             WHERE
               (t2.encounter_datetime >= '${encounterDatetime}')
-                  AND (t2.location_id IN ('4','140','60','102','147','58','218','208','69','62','196','84','72','77','71','206','198','197','186','1','13','14','15','200','199','204','202','201','207','223','70','54','153','73','148','3','217','31','28','211','203','324','330','333','326','325','327','332','328','329','331','11','229','17','227','94','214'))
                   AND (t2.program_id IN (1 , 4,
                   2,
                   11,
@@ -164,8 +162,7 @@ export async function getMissedAppointments(yesterday: string) {
                 FROM
                     etl.flat_appointment t2
                 WHERE
-                    (t2.location_id IN ('4','140','60','102','147','58','218','208','69','62','196','84','72','77','71','206','198','197','186','1','13','14','15','200','199','204','202','201','207','223','70','54','153','73','148','3','217','31','28','211','203','324','330','333','326','325','327','332','328','329','331','11','229','17','227','94','214'))
-                        AND (t2.is_clinical = 1)
+                    (t2.is_clinical = 1)
                         AND (t2.next_clinical_encounter_datetime IS NULL)
                 GROUP BY person_id) t7 ON (t2.person_id = t7.person_id)
                     LEFT JOIN
@@ -190,7 +187,6 @@ export async function getMissedAppointments(yesterday: string) {
             WHERE
                 (DATE(t2.scheduled_date) >= '${yesterday}')
                     AND (DATE(t2.scheduled_date) <= '${yesterday}')
-                    AND (t2.location_id IN ('4','140','60','102','147','58','218','208','69','62','196','84','72','77','71','206','198','197','186','1','13','14','15','200','199','204','202','201','207','223','70','54','153','73','148','3','217','31','28','211','203','324','330','333','326','325','327','332','328','329','331','11','229','17','227','94','214'))
                     AND (t21.program_type_id IN (1 , 4,
                     2,
                     11,

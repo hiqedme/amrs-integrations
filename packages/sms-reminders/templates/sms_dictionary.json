@@ -2,8 +2,8 @@
     "templates":[
         {
             "type":"welcome",
-            "english":"Hello $personName$.Thank you for enrolling to Uzima SMS platform .Your Health is  Our Happiness",
-            "kiswahili":"Jambo $personName$.Asante kwa kujisajili kwa huduma ya Uzima SMS. Afya Yako ni Furaha Yetu"
+            "english":"Hello $personName$.Thank you for enrolling to our SMS reminder platform .Your Health is  Our Happiness",
+            "kiswahili":"Jambo $personName$.Asante kwa kujisajili kwa huduma ya SMS. Afya Yako ni Furaha Yetu"
         },{
             "type":"4days",
             "english":"Hallo $personName$, kindly remember your appointment is due on $rtc_date$. Your Health is our happiness!",
