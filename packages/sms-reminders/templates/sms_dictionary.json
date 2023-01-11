@@ -7,16 +7,16 @@
         },{
             "type":"4days",
             "english":"Hallo $personName$, kindly remember your appointment is due on $rtc_date$. Your Health is our happiness!",
-            "kiswahili":"Hujambo $personName$? Unaombwa uje kwa miadi yako tarehe $rtc_date$. Afya Yako Ni Furaha Yetu."
+            "kiswahili":"Hujambo $personName$? Unatarajiwa kuja tarehe $rtc_date$. Afya Yako Ni Furaha Yetu."
         },{
             "type":"1day",
             "english":"Hallo $personName$, kindly remember your appointment is due TOMORROW $rtc_date$. Your Health is our happiness!",
-            "kiswahili":"Hujambo $personName$? Unaombwa uje kwa miadi yako KESHO $rtc_date$. Afya Yako Ni Furaha Yetu"
+            "kiswahili":"Hujambo $personName$? Unatarajiwa kuja KESHO $rtc_date$. Afya Yako Ni Furaha Yetu"
         },
         {
             "type":"sameday",
             "english":"Hallo $personName$, kindly remember your appointment is due TODAY $rtc_date$. Your Health is our happiness!",
-            "kiswahili":"Hujambo $personName$? Unaombwa uje kwa miadi yako LEO $rtc_date$. Afya Yako Ni Furaha Yetu"
+            "kiswahili":"Hujambo $personName$? Unatarajiwa kuja LEO $rtc_date$. Afya Yako Ni Furaha Yetu"
         },
         {
             "type":"congratulations",
@@ -25,8 +25,8 @@
         },
         {
             "type":"missed",
-            "english":"Hallo $personName$? Your appointment was due yesterday. Kindly make an effort to visit us as soon. In case of any concerns reach us on this number 0800720260.Afya yako ni Furaha Yetu!",
-            "kiswahili":"Hujambo $personName$.Je,waendeleaje?Ulikosa Miadi yako jana.Tafadhali jaribu kututembelea haraka iwezekanavyo.Ikiwa kuna jambo lolote,piga simu kwa nambari 0800720260"
+            "english":"Hallo $personName$? Your appointment was due yesterday. Kindly make an effort to visit us     soon. In case of any concerns reach us on this number 0800720260.Afya yako ni Furaha Yetu!",
+            "kiswahili":"Hujambo $personName$.Je,waendeleaje?Ulitarajariwa jana.Tafadhali jaribu kututembelea haraka iwezekanavyo.Ikiwa kuna jambo lolote,piga simu kwa nambari 0800720260"
         },
         {
             "type":"optout",
