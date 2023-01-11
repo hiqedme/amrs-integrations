@@ -1,0 +1,7 @@
+version: '3'
+services:
+  registry:
+    image: 'ampathke/eid:latest'
+    restart: always
+    volumes: 
+        - ./.env:/packages/eid/.env

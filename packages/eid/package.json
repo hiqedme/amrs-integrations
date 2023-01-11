@@ -1,0 +1,36 @@
+{
+  "name": "@amrs-integrations/eid",
+  "version": "0.1.0-alpha.1",
+  "description": "Service that is used to process uploaded csv results into the openmrs database",
+  "keywords": [
+    "eid",
+    "csv"
+  ],
+  "author": "derrick rono <derrickrono@gmail.com>",
+  "homepage": "https://github.com/AMPATH/amrs-integrations#readme",
+  "license": "ISC",
+  "main": "lib/eid.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AMPATH/amrs-integrations.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "start": "tsc && node ./dist/app.js",
+    "build": "tsc"
+  },
+  "bugs": {
+    "url": "https://github.com/AMPATH/amrs-integrations/issues"
+  },
+  "dependencies": {
+    "@amrs-integrations/core": "^0.1.0-alpha.18",
+    "@hapi/hapi": "20.2.2"
+  }
+}
