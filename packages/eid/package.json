@@ -23,14 +23,19 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "start": "tsc && node ./dist/app.js",
-    "build": "tsc"
+    "start": "tsc &&  yarn postbuild && node ./dist/app.js",
+    "build": "tsc",
+    "postbuild": "rsync -avum --include='*.csv' app/uploads ./dist/app/"
   },
   "bugs": {
     "url": "https://github.com/AMPATH/amrs-integrations/issues"
   },
   "dependencies": {
     "@amrs-integrations/core": "^0.1.0-alpha.18",
-    "@hapi/hapi": "20.2.2"
+    "@hapi/hapi": "20.2.2",
+    "papaparse": "^5.3.2"
+  },
+  "devDependencies": {
+    "@types/papaparse": "^5.3.7"
   }
 }
