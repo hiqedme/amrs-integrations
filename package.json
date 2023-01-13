@@ -9,6 +9,7 @@
     "sms": "cd packages/sms-reminders && yarn start",
     "core": "cd packages/core && rm -rf dist && tsc",
     "registry": "cd packages/patient-registry && yarn start",
+    "eid": "cd packages/eid && yarn start",
     "build": "lerna run build",
     "clean": "yarn clean:artifacts && yarn clean:packages && yarn clean:root && rm -rf packages/core/dist",
     "clean:artifacts": "lerna run clean --parallel",
