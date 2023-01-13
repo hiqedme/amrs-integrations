@@ -8,7 +8,8 @@ import path from "path";
 export default class ExtractVLAndPostToETL {
   public async readCSVAndPost() {
     try {
-      const file = Fs.readFileSync(path.join(path.dirname(__dirname), '../app/uploads/file.csv'),
+      const file = Fs.readFileSync(
+        path.join(path.dirname(__dirname), "../app/uploads/file.csv"),
         "utf-8"
       );
       // Replace spaces in headers with underscores
@@ -28,12 +29,17 @@ export default class ExtractVLAndPostToETL {
         let patientUUID: any = await getPatient.getPatientUUIDUsingIdentifier(
           data.patient_ccc_no
         );
+   //     console.log("PATIENT UUID"+ patientUUID );
+
         if (patientUUID.length > 0) {
           let validator = new Validators();
           let valid = validator.checkStatusOfViralLoad(data.lab_viral_load);
           if (valid === 0 || valid === 1) {
             data.viral_load = 0;
-            let collection_date=moment.utc(data.collection_date,"DD/MM/YYYY").add(3, 'hours').format();
+            let collection_date = moment
+              .utc(data.collection_date, "DD/MM/YYYY")
+              .add(3, "hours")
+              .format();
             let obs: EIDPayloads.Observation = {
               person: patientUUID[0].uuid,
               concept: "a8982474-1350-11df-a1f1-0026b9348838",
@@ -52,10 +58,7 @@ export default class ExtractVLAndPostToETL {
             httpClient.axios
               .post("", obs)
               .then(async (openHIMResp: any) => {
-                console.log(
-                  "VL saved successfully",
-                  openHIMResp.identifier
-                );
+                console.log("VL saved successfully", openHIMResp.identifier);
               })
               .catch((err: any) => {
                 console.log("Error", err);
