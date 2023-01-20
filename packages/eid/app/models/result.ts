@@ -21,6 +21,6 @@ declare module EIDPayloads {
     concept: string;
     obsDatetime: any;
     value: number;
-    order:string
-}
+    order: string;
+  }
 }
