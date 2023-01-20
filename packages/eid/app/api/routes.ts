@@ -1,5 +1,6 @@
 import { ResponseToolkit, ServerRoute } from "@hapi/hapi";
 import ExtractVLAndPostToETL from "../services/vl_extractor";
+import ExtractCD4AndPostToETL from "../services/cd4_extractor";
 import UploadSaveAndArchiveCSV from "../services/csv_upload";
 
 let payload1: any = {
@@ -13,11 +14,21 @@ let payload1: any = {
 export const apiRoutes: ServerRoute[] = [
   {
     method: "GET",
-    path: "/api/push",
+    path: "/api/push/viral_load",
     handler: async function (request, h: ResponseToolkit) {
       let convertionService = new ExtractVLAndPostToETL();
       await convertionService.readCSVAndPost();
       return "success";
+    },
+  },
+  {
+    method: "GET",
+    path: "/api/push/cd4_count",
+    handler: async function (request, h: ResponseToolkit) {
+       console.log("sisi ndio tuko");
+      let convertionService= new ExtractCD4AndPostToETL();
+      await convertionService.readCSVAndPost();
+     return "success"
     },
   },
   {
