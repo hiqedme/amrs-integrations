@@ -12,6 +12,7 @@ export default class ExtractCD4AndPostToETL {
         path.join(path.dirname(__dirname), "../app/uploads/cd4_file.csv"),
         "utf-8"
       );
+      console.log(file);
       // Replace spaces in headers with underscores
 
       // const options = {
