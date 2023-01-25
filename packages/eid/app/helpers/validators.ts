@@ -1,7 +1,11 @@
 import _ from "lodash";
+
 // import * as fast_csv from "fast-csv";
 import * as fs from "fs";
 import * as Papa from "papaparse";
+
+
+
 export default class Validators {
   checkStatusOfViralLoad(viralLoadPayload: string) {
     let status = 0;
@@ -35,6 +39,7 @@ export default class Validators {
     }
     return whitePaceVar;
   }
+
   validateCsv(file: any) {
     // console.log(file.mimetype, file.hapi.headers['content-type']);
     if (file.hapi.headers["content-type"] !== "text/csv") {
@@ -71,4 +76,5 @@ export default class Validators {
       // .on('error', reject);
     });
   }
+
 }

@@ -1,5 +1,6 @@
 import { ResponseToolkit, ServerRoute } from "@hapi/hapi";
 import ExtractVLAndPostToETL from "../services/vl_extractor";
+
 import ExtractCD4AndPostToETL from "../services/cd4_extractor";
 import UploadSaveAndArchiveCSV from "../services/csv_upload";
 
@@ -15,12 +16,20 @@ export const apiRoutes: ServerRoute[] = [
   {
     method: "GET",
     path: "/api/push/viral_load",
+
+
+export const apiRoutes: ServerRoute[] = [
+  {
+    method: "GET",
+    path: "/api/push",
+
     handler: async function (request, h: ResponseToolkit) {
       let convertionService = new ExtractVLAndPostToETL();
       await convertionService.readCSVAndPost();
       return "success";
     },
   },
+
   {
     method: "GET",
     path: "/api/push/cd4_count",
@@ -49,4 +58,5 @@ export const apiRoutes: ServerRoute[] = [
       return "CSV Uploaded";
     },
   }
+
 ];
