@@ -1,4 +1,5 @@
 import _ from "lodash";
+
 // import * as fast_csv from "fast-csv";
 import * as fs from "fs";
 import * as Papa from "papaparse";
@@ -7,6 +8,14 @@ export default class Validators {
     var status = 0;
     var hasNumbersOnly = /^[0-9]*(?:\.\d{1,2})?$/;
     var hasLessThanSymbol = /</g;
+
+
+export default class Validators {
+  checkStatusOfViralLoad(viralLoadPayload: string) {
+    let status = 0;
+    const hasNumbersOnly = /^[0-9]*(?:\.\d{1,2})?$/;
+    const hasLessThanSymbol = /</g;
+
     if (_.isEmpty(viralLoadPayload)) return -1;
     var viralLoadResult = this.removeWhiteSpace(viralLoadPayload);
 
@@ -34,7 +43,7 @@ export default class Validators {
       whitePaceVar = param.replace(/\s+/g, "");
     }
     return whitePaceVar;
-  }
+  
   validateCsv(file: any) {
     // console.log(file.mimetype, file.hapi.headers['content-type']);
     if (file.hapi.headers["content-type"] !== "text/csv") {
@@ -71,4 +80,5 @@ export default class Validators {
       // .on('error', reject);
     });
   }
+
 }

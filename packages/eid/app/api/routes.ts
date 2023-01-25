@@ -1,5 +1,6 @@
 import { ResponseToolkit, ServerRoute } from "@hapi/hapi";
 import ExtractVLAndPostToETL from "../services/vl_extractor";
+
 import UploadSaveAndArchiveCSV from "../services/csv_upload";
 
 let payload1: any = {
@@ -10,11 +11,15 @@ let payload1: any = {
     allow: "multipart/form-data",
   },
 };
+
+
+
 export const apiRoutes: ServerRoute[] = [
   {
     method: "GET",
     path: "/api/push",
     handler: async function (request, h: ResponseToolkit) {
+
       let convertionService= new ExtractVLAndPostToETL();
       await convertionService.readCSVAndPost();
      return "success"
@@ -39,3 +44,11 @@ export const apiRoutes: ServerRoute[] = [
     },
   }
 ];
+
+      let convertionService = new ExtractVLAndPostToETL();
+      await convertionService.readCSVAndPost();
+      return "success";
+    },
+  },
+];
+
