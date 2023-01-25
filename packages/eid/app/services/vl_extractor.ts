@@ -29,9 +29,11 @@ export default class ExtractVLAndPostToETL {
         let patientUUID: any = await getPatient.getPatientUUIDUsingIdentifier(
           data.patient_ccc_no
         );
+
         let order_number: any = await getPatient.getPatientOrderNumber(
           data.order_number
         );
+
         if (patientUUID.length > 0) {
           let validator = new Validators();
           let valid = validator.checkStatusOfViralLoad(data.lab_viral_load);
@@ -45,6 +47,13 @@ export default class ExtractVLAndPostToETL {
               person: patientUUID[0].uuid,
               concept: "a8982474-1350-11df-a1f1-0026b9348838",
               obsDatetime: collection_date,
+
+              value: valid = 1 ? data.viral_load : 0,
+            };
+            ResultData.push(obs);
+            let httpClient = new config.HTTPInterceptor(
+              config.dhp.url || "http://10.50.80.56:5001/eid/csv",
+
               value: valid == 1 ? data.lab_viral_load : 0,
               order: order_number.length > 0 ? data.order_number : null,
             };
@@ -60,7 +69,10 @@ export default class ExtractVLAndPostToETL {
             httpClient.axios
               .post("", obs)
               .then(async (openHIMResp: any) => {
+                console.log("VL saved successfully", openHIMResp.identifier);
+
                 console.log("VL saved successfully", openHIMResp);
+
               })
               .catch((err: any) => {
                 console.log("Error", err);
@@ -70,6 +82,10 @@ export default class ExtractVLAndPostToETL {
           }
         }
       }
+
+
+      console.log(ResultData);
+
       return ResultData;
     } catch (err) {
       console.log(err);
