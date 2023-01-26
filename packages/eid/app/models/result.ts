@@ -27,10 +27,5 @@ declare module EIDPayloads {
 }
 
 
-}
-}
-    order: string;
-  }
-}
 
 
