@@ -33,10 +33,7 @@
   "dependencies": {
     "@amrs-integrations/core": "^0.1.0-alpha.18",
     "@hapi/hapi": "20.2.2",
-
-
     "moment": "^2.29.4",
-
     "papaparse": "^5.3.2"
   },
   "devDependencies": {
