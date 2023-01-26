@@ -36,7 +36,6 @@ export default class Validators {
       whitePaceVar = param.replace(/\s+/g, "");
     }
     return whitePaceVar;
-
   }
 
   validateCsv(file: any) {
@@ -53,7 +52,7 @@ export default class Validators {
     return true;
   }
   validateColumns(filePath: fs.PathLike, expectedColumns: any) {
-   // console.log(expectedColumns);
+    // console.log(expectedColumns);
     const file = fs.readFileSync(filePath, "utf-8");
 
     return new Promise<void>((resolve, reject) => {
@@ -68,12 +67,11 @@ export default class Validators {
           `The following columns are missing: ${missingColumns.join(", ")}`
         );
       } else {
-       // console.log("all columns present");
+        // console.log("all columns present");
         resolve();
       }
 
       // .on('error', reject);
     });
   }
-
 }

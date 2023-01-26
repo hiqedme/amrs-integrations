@@ -115,3 +115,5 @@ build/
 
 
 token.txt
+#all csv files
+*.csv

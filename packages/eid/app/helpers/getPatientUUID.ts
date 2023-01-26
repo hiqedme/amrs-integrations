@@ -1,8 +1,6 @@
 import config from "@amrs-integrations/core";
 let CM = config.ConnectionManager.getInstance();
 
-
-
 export default class GetPatient {
   async getPatientUUIDUsingIdentifier(params: string) {
     let amrsCON = await CM.getConnectionAmrs();
@@ -19,4 +17,3 @@ export default class GetPatient {
     return result;
   }
 }
-
