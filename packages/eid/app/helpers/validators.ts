@@ -28,46 +28,46 @@ export default class Validators {
     }
     return status;
   }
+  // remove all the white spaces
   removeWhiteSpace(param: string) {
-    var whitePaceVar;
+    var whiteSpaceVar;
     if (param === "" || param === null) {
-      whitePaceVar = "";
+      whiteSpaceVar = "";
     } else {
-      whitePaceVar = param.replace(/\s+/g, "");
+      whiteSpaceVar = param.replace(/\s+/g, "");
     }
-    return whitePaceVar;
+    return whiteSpaceVar;
   }
 
   validateCsv(file: any) {
-    // console.log(file.mimetype, file.hapi.headers['content-type']);
+    // check that file is  aCSV
     if (file.hapi.headers["content-type"] !== "text/csv") {
       return { error: "Invalid file type. Only CSV files are allowed" };
     }
-    if (file.size > 10000) {
-      //10MB
+    const oneMB = 1024 * 1024;
+    // check file size
+    if (file.size > oneMB) {
+      //1MB
       return { error: "File size too large" };
     }
-    // const validatecols = this.validateColumns(file,['Worksheet'])
 
     return true;
   }
+  // check if all the required columns are present
   validateColumns(filePath: fs.PathLike, expectedColumns: any) {
-    // console.log(expectedColumns);
     const file = fs.readFileSync(filePath, "utf-8");
 
     return new Promise<void>((resolve, reject) => {
-      //let headers: string | any[];
       const headers = Papa.parse(file, {
         header: true,
       }).meta.fields;
-      //console.log(headers);
+
       let missingColumns = _.difference(expectedColumns, headers || []);
       if (missingColumns.length > 0) {
         reject(
           `The following columns are missing: ${missingColumns.join(", ")}`
         );
       } else {
-        // console.log("all columns present");
         resolve();
       }
 
