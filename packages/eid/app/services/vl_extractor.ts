@@ -6,6 +6,10 @@ import Validators from "../helpers/validators";
 import moment from "moment";
 import path from "path";
 export default class ExtractVLAndPostToETL {
+
+
+
+
   public async readCSVAndPost() {
     try {
       const file = Fs.readFileSync(
@@ -32,9 +36,12 @@ export default class ExtractVLAndPostToETL {
         let order_number: any = await getPatient.getPatientOrderNumber(
           data.order_number
         );
+
         if (patientUUID.length > 0) {
           let validator = new Validators();
-          let valid = validator.checkStatusOfViralLoad(data.lab_viral_load);
+          let valid: any = validator.checkStatusOfViralLoad(
+            data.lab_viral_load
+          );
           if (valid === 0 || valid === 1) {
             data.viral_load = 0;
             let collection_date = moment
@@ -45,6 +52,7 @@ export default class ExtractVLAndPostToETL {
               person: patientUUID[0].uuid,
               concept: "a8982474-1350-11df-a1f1-0026b9348838",
               obsDatetime: collection_date,
+
               value: valid == 1 ? data.lab_viral_load : 0,
               order: order_number.length > 0 ? data.order_number : null,
             };
@@ -70,9 +78,11 @@ export default class ExtractVLAndPostToETL {
           }
         }
       }
+      console.log(ResultData);
       return ResultData;
     } catch (err) {
       console.log(err);
     }
   }
+
 }

@@ -109,3 +109,9 @@ build/
 /app/sample_data.ts
 /app/uploads
 token.txt
+
+#all csv files
+*.csv
+
+#all DSstore files
+*.DS_Store

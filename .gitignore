@@ -107,3 +107,10 @@ build/
 
 /app/poc_sample_payload.ts
 /app/sample_data.ts
+#all csv files
+*.csv
+
+#all DSstore files
+*.DS_Store
+
+

@@ -1,10 +1,14 @@
 import _ from "lodash";
 
+// import * as fast_csv from "fast-csv";
+import * as fs from "fs";
+import * as Papa from "papaparse";
 export default class Validators {
   checkStatusOfViralLoad(viralLoadPayload: string) {
     let status = 0;
     const hasNumbersOnly = /^[0-9]*(?:\.\d{1,2})?$/;
     const hasLessThanSymbol = /</g;
+
     if (_.isEmpty(viralLoadPayload)) return -1;
     var viralLoadResult = this.removeWhiteSpace(viralLoadPayload);
 
@@ -24,13 +28,50 @@ export default class Validators {
     }
     return status;
   }
+  // remove all the white spaces
   removeWhiteSpace(param: string) {
-    var whitePaceVar;
+    var whiteSpaceVar;
     if (param === "" || param === null) {
-      whitePaceVar = "";
+      whiteSpaceVar = "";
     } else {
-      whitePaceVar = param.replace(/\s+/g, "");
+      whiteSpaceVar = param.replace(/\s+/g, "");
     }
-    return whitePaceVar;
+    return whiteSpaceVar;
+  }
+
+  validateCsv(file: any) {
+    // check that file is  aCSV
+    if (file.hapi.headers["content-type"] !== "text/csv") {
+      return { error: "Invalid file type. Only CSV files are allowed" };
+    }
+    const oneMB = 1024 * 1024;
+    // check file size
+    if (file.size > oneMB) {
+      //1MB
+      return { error: "File size too large" };
+    }
+
+    return true;
+  }
+  // check if all the required columns are present
+  validateColumns(filePath: fs.PathLike, expectedColumns: any) {
+    const file = fs.readFileSync(filePath, "utf-8");
+
+    return new Promise<void>((resolve, reject) => {
+      const headers = Papa.parse(file, {
+        header: true,
+      }).meta.fields;
+
+      let missingColumns = _.difference(expectedColumns, headers || []);
+      if (missingColumns.length > 0) {
+        reject(
+          `The following columns are missing: ${missingColumns.join(", ")}`
+        );
+      } else {
+        resolve();
+      }
+
+      // .on('error', reject);
+    });
   }
 }
