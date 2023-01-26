@@ -61,7 +61,7 @@ export default class ExtractCD4AndPostToETL {
           ResultData.push(obs);
 
           let httpClient = new config.HTTPInterceptor(
-            config.dhp.url || "http://10.50.80.56:5001/eid/csv",
+            config.dhp.url || "",
             "",
             "",
             "dhp",
