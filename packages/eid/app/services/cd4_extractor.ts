@@ -38,7 +38,7 @@ export default class ExtractCD4AndPostToETL {
           data.ampath_no
         );
 
-        // console.log("PATIENT UUID" + patientUUID);
+       
 
         if (patientUUID.length > 0) {
           //initialize variables
