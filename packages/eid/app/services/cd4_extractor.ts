@@ -38,8 +38,6 @@ export default class ExtractCD4AndPostToETL {
           data.ampath_no
         );
 
-       
-
         if (patientUUID.length > 0) {
           //initialize variables
           let validator = new Validators();

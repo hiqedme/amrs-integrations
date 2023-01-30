@@ -26,7 +26,8 @@ export default class GetPatient {
   }
   async checkPatientDataSync(params: any) {
     let amrsCON = await CM.getConnectionAmrs();
-    let sql = `select count(obs_id) from amrs.obs where concept_id='${params.concept_id}' and obs_datetime >='${params.collection_date}'  and voided=0;`;
+    let sql = `select count(obs_id) from amrs.obs where concept_id='${params.concept_id}' and obs_datetime >='${params.collection_date}' and patient_id='${params.patient_id}' and 
+    value_numeric='${params.viral_load}'   and voided=0;`;
     let result: string = await CM.query(sql, amrsCON);
     await CM.releaseConnections(amrsCON);
     return result;

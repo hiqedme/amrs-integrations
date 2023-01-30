@@ -16,7 +16,7 @@ export const apiRoutes: ServerRoute[] = [
   {
     method: "GET",
     path: "/api/push/viral_load",
-// extract viral load and send to POC
+    // extract viral load and send to POC
     handler: async function (request, h: ResponseToolkit) {
       let convertionService = new ExtractVLAndPostToETL();
       await convertionService.readCSVAndPost();

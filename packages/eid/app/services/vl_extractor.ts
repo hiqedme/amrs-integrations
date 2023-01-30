@@ -39,15 +39,20 @@ export default class ExtractVLAndPostToETL {
         //check type of identifier
         if (validator.checkIdentifierIsCCC(data.patient_ccc_no)) {
           let patientCCCNo = data.patient_ccc_no;
-
           patientUUID = await getPatient.getPatientUUIDUsingCCCNo(patientCCCNo);
         } else {
           let identifierNo = data.patient_ccc_no;
-          patientUUID = await getPatient.getPatientUUIDUsingIdentifier(identifierNo);
+          patientUUID = await getPatient.getPatientUUIDUsingIdentifier(
+            identifierNo
+          );
         }
-        order_number = await getPatient.getPatientOrderNumber(data.order_number);
+        order_number = await getPatient.getPatientOrderNumber(
+          data.order_number
+        );
         if (patientUUID.length > 0) {
-          let valid: any = validator.checkStatusOfViralLoad(data.lab_viral_load);
+          let valid: any = validator.checkStatusOfViralLoad(
+            data.lab_viral_load
+          );
           if (valid === 0 || valid === 1) {
             data.viral_load = 0;
             let collection_date = moment

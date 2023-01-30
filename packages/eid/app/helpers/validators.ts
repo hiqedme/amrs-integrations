@@ -96,7 +96,7 @@ export default class Validators {
     }
     return isValid;
   }
-  checkIdentifierIsAmrsNo(identifierNumber: any){
+  checkIdentifierIsAmrsNo(identifierNumber: any) {
     let isValid: Boolean = false;
     let numberToCheck: any = identifierNumber;
     // remove spaces and special characters
