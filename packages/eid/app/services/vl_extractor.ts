@@ -27,65 +27,65 @@ export default class ExtractVLAndPostToETL {
         let data: any = row;
         let getPatient = new GetPatient();
         let validator = new Validators();
-        let patientUUID: any;
+        let patientUUID: any = "";
         let order_number: any;
+        let obs_count: any;
+        //cehck if data is already synced
+        obs_count = await getPatient.checkPatientDataSync(data);
+        if (obs_count > 0) {
+          //data already synced for this patient
+          continue;
+        }
         //check type of identifier
         if (validator.checkIdentifierIsCCC(data.patient_ccc_no)) {
-     
           let patientCCCNo = data.patient_ccc_no;
 
-          patientUUID = await getPatient.getPatientUUIDUsingIdentifier(
-            data.patient_ccc_no
-          );
-          order_number = await getPatient.getPatientOrderNumber(
-            data.order_number
-          );
+          patientUUID = await getPatient.getPatientUUIDUsingCCCNo(patientCCCNo);
+        } else {
+          let identifierNo = data.patient_ccc_no;
+          patientUUID = await getPatient.getPatientUUIDUsingIdentifier(identifierNo);
+        }
+        order_number = await getPatient.getPatientOrderNumber(data.order_number);
+        if (patientUUID.length > 0) {
+          let valid: any = validator.checkStatusOfViralLoad(data.lab_viral_load);
+          if (valid === 0 || valid === 1) {
+            data.viral_load = 0;
+            let collection_date = moment
+              .utc(data.collection_date, "DD/MM/YYYY")
+              .add(3, "hours")
+              .format();
+            let obs: EIDPayloads.Observation = {
+              person: patientUUID[0].uuid,
+              concept: "a8982474-1350-11df-a1f1-0026b9348838",
+              obsDatetime: collection_date,
 
-          if (patientUUID.length > 0) {
-            let valid: any = validator.checkStatusOfViralLoad(
-              data.lab_viral_load
+              value: valid == 1 ? data.lab_viral_load : 0,
+              order: order_number.length > 0 ? data.order_number : null,
+            };
+            ResultData.push(obs);
+            let httpClient = new config.HTTPInterceptor(
+              config.dhp.url || "",
+              "",
+              "",
+              "dhp",
+              ""
             );
-            if (valid === 0 || valid === 1) {
-              data.viral_load = 0;
-              let collection_date = moment
-                .utc(data.collection_date, "DD/MM/YYYY")
-                .add(3, "hours")
-                .format();
-              let obs: EIDPayloads.Observation = {
-                person: patientUUID[0].uuid,
-                concept: "a8982474-1350-11df-a1f1-0026b9348838",
-                obsDatetime: collection_date,
 
-                value: valid == 1 ? data.lab_viral_load : 0,
-                order: order_number.length > 0 ? data.order_number : null,
-              };
-              ResultData.push(obs);
-              let httpClient = new config.HTTPInterceptor(
-                config.dhp.url || "",
-                "",
-                "",
-                "dhp",
-                ""
-              );
-
-              httpClient.axios
-                .post("", obs)
-                .then(async (openHIMResp: any) => {
-                  console.log("VL saved successfully", openHIMResp);
-                })
-                .catch((err: any) => {
-                  console.log("Error", err);
-                });
-            } else {
-              console.log(data.lab_viral_load);
-            }
+            httpClient.axios
+              .post("", obs)
+              .then(async (openHIMResp: any) => {
+                console.log("VL saved successfully", openHIMResp);
+              })
+              .catch((err: any) => {
+                console.log("Error", err);
+              });
+          } else {
+            console.log(data.lab_viral_load);
           }
-       
+        }
+
         console.log(ResultData);
         return ResultData;
-      } else {
-        console.log("Invalid Identifier: "+data.patient_ccc_no);
-      }
       }
     } catch (err) {
       console.log(err);

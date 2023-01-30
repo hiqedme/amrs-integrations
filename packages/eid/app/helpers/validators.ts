@@ -76,26 +76,45 @@ export default class Validators {
   }
   // identify type of identifier passed
   checkIdentifierIsCCC(identifierNumber: any) {
-    let isCCC: Boolean = false;
+    let isValid: Boolean = false;
     let numberToCheck: any = identifierNumber;
-   
-    // remove spaces and special characterss
+    // remove spaces and special characters
     numberToCheck = numberToCheck.replace(/[^a-zA-Z0-9]/g, "");
     // check if all are numbers
     if (isNaN(numberToCheck)) {
-      isCCC = false;
+      isValid = false;
     }
     // check if they are 10 digits
     else if (numberToCheck.length != 10) {
-      isCCC = false;
+      isValid = false;
     }
     // check position of the hyphen
     else if (identifierNumber.indexOf("-") != 5) {
-      isCCC = false;
+      isValid = false;
     } else {
-      isCCC = true;
+      isValid = true;
     }
-
-    return isCCC;
+    return isValid;
+  }
+  checkIdentifierIsAmrsNo(identifierNumber: any){
+    let isValid: Boolean = false;
+    let numberToCheck: any = identifierNumber;
+    // remove spaces and special characters
+    numberToCheck = numberToCheck.replace(/[^a-zA-Z0-9]/g, "");
+    // check if all are numbers
+    if (isNaN(numberToCheck)) {
+      isValid = false;
+    }
+    // check if they are 10 digits
+    else if (numberToCheck.length != 10) {
+      isValid = false;
+    }
+    // check position of the hyphen
+    else if (identifierNumber.indexOf("-") != 9) {
+      isValid = false;
+    } else {
+      isValid = true;
+    }
+    return isValid;
   }
 }
