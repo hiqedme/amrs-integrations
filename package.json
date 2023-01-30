@@ -23,6 +23,7 @@
     "prettier": "^2.1.2"
   },
   "dependencies": {
+    "16": "^0.0.2",
     "axios": "^0.26.0",
     "bluebird": "^3.7.2",
     "btoa": "^1.2.1",
