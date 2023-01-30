@@ -45,7 +45,7 @@ export default class Validators {
       return { error: "Invalid file type. Only CSV files are allowed" };
     }
     const oneMB = 1024 * 1024;
-    // check file size
+    // check file size517
     if (file.size > oneMB) {
       //1MB
       return { error: "File size too large" };
@@ -73,5 +73,29 @@ export default class Validators {
 
       // .on('error', reject);
     });
+  }
+  // identify type of identifier passed
+  checkIdentifierIsCCC(identifierNumber: any) {
+    let isCCC: Boolean = false;
+    let numberToCheck: any = identifierNumber;
+   
+    // remove spaces and special characterss
+    numberToCheck = numberToCheck.replace(/[^a-zA-Z0-9]/g, "");
+    // check if all are numbers
+    if (isNaN(numberToCheck)) {
+      isCCC = false;
+    }
+    // check if they are 10 digits
+    else if (numberToCheck.length != 10) {
+      isCCC = false;
+    }
+    // check position of the hyphen
+    else if (identifierNumber.indexOf("-") != 5) {
+      isCCC = false;
+    } else {
+      isCCC = true;
+    }
+
+    return isCCC;
   }
 }
