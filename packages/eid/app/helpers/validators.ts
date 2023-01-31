@@ -3,14 +3,17 @@ import _ from "lodash";
 // import * as fast_csv from "fast-csv";
 import * as fs from "fs";
 import * as Papa from "papaparse";
+import Helpers from "./helperFunctions";
 export default class Validators {
+  
   checkStatusOfViralLoad(viralLoadPayload: string) {
     let status = 0;
     const hasNumbersOnly = /^[0-9]*(?:\.\d{1,2})?$/;
     const hasLessThanSymbol = /</g;
+    const helper = new Helpers();
 
     if (_.isEmpty(viralLoadPayload)) return -1;
-    var viralLoadResult = this.removeWhiteSpace(viralLoadPayload);
+    var viralLoadResult = helper.removeWhiteSpace(viralLoadPayload);
 
     if (_.isEmpty(viralLoadResult)) {
       return -1;
@@ -28,16 +31,7 @@ export default class Validators {
     }
     return status;
   }
-  // remove all the white spaces
-  removeWhiteSpace(param: string) {
-    var whiteSpaceVar;
-    if (param === "" || param === null) {
-      whiteSpaceVar = "";
-    } else {
-      whiteSpaceVar = param.replace(/\s+/g, "");
-    }
-    return whiteSpaceVar;
-  }
+
 
   validateCsv(file: any) {
     // check that file is  aCSV
@@ -117,4 +111,5 @@ export default class Validators {
     }
     return isValid;
   }
+  
 }
