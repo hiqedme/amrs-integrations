@@ -27,20 +27,25 @@ export default class ExtractCD4AndPostToETL {
       };
 
       const rows = Papa.parse(file, options).data;
-      console.log(rows);
+
       let ResultData: any = [];
       // Iterate through rows and make POST requests
       for (let row of rows) {
         // Get patient UUID using identifier
         let data: any = row;
         let getPatient = new GetPatient();
+        let validator = new Validators();
+        let isCCC: boolean = validator.checkIdentifierIsCCC(
+          data.patient_ccc_no
+        );
         let patientUUID: any = await getPatient.getPatientUUIDUsingIdentifier(
-          data.ampath_no
+          data.ampath_no,
+          isCCC
         );
 
         if (patientUUID.length > 0) {
           //initialize variables
-          let validator = new Validators();
+
           const cd4_abs: number = data.ampath_no;
 
           let collection_date = moment
@@ -78,7 +83,6 @@ export default class ExtractCD4AndPostToETL {
       console.log(ResultData);
       console.log("successfuly extracted");
       return ResultData;
-     
     } catch (err) {
       console.log(err);
     }

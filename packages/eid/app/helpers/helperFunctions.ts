@@ -4,15 +4,15 @@ import _ from "lodash";
 import * as fs from "fs";
 import * as Papa from "papaparse";
 export default class Helpers {
-    // log errors
-  logError = (Error: any, fileName: string) => {
+  // log errors
+  logError(Error: any, fileName: string) {
     const logMessage = `[${new Date().toISOString()}] ${Error}\n`;
     fs.appendFile(fileName, logMessage, (err) => {
       if (err) {
         console.error(err);
       }
     });
-  };
+  }
 
   // remove all the white spaces
   removeWhiteSpace(param: string) {

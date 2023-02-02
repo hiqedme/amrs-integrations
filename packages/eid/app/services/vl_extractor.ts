@@ -9,6 +9,7 @@ import path from "path";
 export default class ExtractVLAndPostToETL {
   public async readCSVAndPost() {
     try {
+      let logMessage: String;
       const helper = new Helpers();
       const file = Fs.readFileSync(
         path.join(path.dirname(__dirname), "../app/uploads/test_data.csv"),
@@ -34,22 +35,20 @@ export default class ExtractVLAndPostToETL {
         let obs_count: any;
 
         //check type of identifier
-        if (validator.checkIdentifierIsCCC(data.patient_ccc_no)) {
-          let patientCCCNo = data.patient_ccc_no;
-          patientUUID = await getPatient.getPatientUUIDUsingCCCNo(patientCCCNo);
-        } else {
-          let identifierNo = data.patient_ccc_no;
-          patientUUID = await getPatient.getPatientUUIDUsingIdentifier(
-            identifierNo
-          );
-        }
+        let isCCC: boolean = validator.checkIdentifierIsCCC(
+          data.patient_ccc_no
+        );
+        patientUUID = await getPatient.getPatientUUIDUsingIdentifier(
+          data.patient_ccc_no,
+          isCCC
+        );
 
-        
         //check if data is already synced
         obs_count = await getPatient.checkPatientDataSync(data, patientUUID);
         if (obs_count[0].count > 0) {
-          console.log("synced!");
+          logMessage = "Patient Results Already Synced" + data.patient_ccc_no;
           //data already synced for this patient
+          helper.logError(logMessage, "syncedLog.log");
           continue;
         }
         // getpatient order number
@@ -98,15 +97,15 @@ export default class ExtractVLAndPostToETL {
             console.log(ResultData);
             return ResultData;
           } else {
-            let logmessage =
+            logMessage =
               "Viral Load not valid. Input value: " + data.lab_viral_load;
-            helper.logError(logmessage, "viralloadErrorLog.log");
+            helper.logError(logMessage, "viralloadErrorLog.log");
           }
         } else {
           //log erroneaous identifier
-          let logmessage: String =
+          logMessage =
             "UUID doesn't exist for identifier: " + data.patient_ccc_no;
-          helper.logError(logmessage, "syncErroLog.log");
+          helper.logError(logMessage, "syncErroLog.log");
           continue;
         }
       }

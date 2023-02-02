@@ -5,7 +5,6 @@ import * as fs from "fs";
 import * as Papa from "papaparse";
 import Helpers from "./helperFunctions";
 export default class Validators {
-  
   checkStatusOfViralLoad(viralLoadPayload: string) {
     let status = 0;
     const hasNumbersOnly = /^[0-9]*(?:\.\d{1,2})?$/;
@@ -31,7 +30,6 @@ export default class Validators {
     }
     return status;
   }
-
 
   validateCsv(file: any) {
     // check that file is  aCSV
@@ -70,7 +68,7 @@ export default class Validators {
   }
   // identify type of identifier passed
   checkIdentifierIsCCC(identifierNumber: any) {
-    let isValid: Boolean = false;
+    let isValid: boolean = false;
     let numberToCheck: any = identifierNumber;
     // remove spaces and special characters
     numberToCheck = numberToCheck.replace(/[^a-zA-Z0-9]/g, "");
@@ -90,26 +88,4 @@ export default class Validators {
     }
     return isValid;
   }
-  checkIdentifierIsAmrsNo(identifierNumber: any) {
-    let isValid: Boolean = false;
-    let numberToCheck: any = identifierNumber;
-    // remove spaces and special characters
-    numberToCheck = numberToCheck.replace(/[^a-zA-Z0-9]/g, "");
-    // check if all are numbers
-    if (isNaN(numberToCheck)) {
-      isValid = false;
-    }
-    // check if they are 10 digits
-    else if (numberToCheck.length != 10) {
-      isValid = false;
-    }
-    // check position of the hyphen
-    else if (identifierNumber.indexOf("-") != 9) {
-      isValid = false;
-    } else {
-      isValid = true;
-    }
-    return isValid;
-  }
-  
 }
