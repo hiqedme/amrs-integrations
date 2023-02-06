@@ -80,8 +80,6 @@ export default class ExtractCD4AndPostToETL {
             });
         }
       }
-      console.log(ResultData);
-      console.log("successfuly extracted");
       return ResultData;
     } catch (err) {
       console.log(err);

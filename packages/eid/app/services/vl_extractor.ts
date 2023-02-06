@@ -94,7 +94,7 @@ export default class ExtractVLAndPostToETL {
               .catch((err: any) => {
                 console.log("Error", err);
               });
-            console.log(ResultData);
+
             return ResultData;
           } else {
             logMessage =
