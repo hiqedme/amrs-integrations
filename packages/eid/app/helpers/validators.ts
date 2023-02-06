@@ -3,14 +3,16 @@ import _ from "lodash";
 // import * as fast_csv from "fast-csv";
 import * as fs from "fs";
 import * as Papa from "papaparse";
+import Helpers from "./helperFunctions";
 export default class Validators {
   checkStatusOfViralLoad(viralLoadPayload: string) {
     let status = 0;
     const hasNumbersOnly = /^[0-9]*(?:\.\d{1,2})?$/;
     const hasLessThanSymbol = /</g;
+    const helper = new Helpers();
 
     if (_.isEmpty(viralLoadPayload)) return -1;
-    var viralLoadResult = this.removeWhiteSpace(viralLoadPayload);
+    var viralLoadResult = helper.removeWhiteSpace(viralLoadPayload);
 
     if (_.isEmpty(viralLoadResult)) {
       return -1;
@@ -28,16 +30,6 @@ export default class Validators {
     }
     return status;
   }
-  // remove all the white spaces
-  removeWhiteSpace(param: string) {
-    var whiteSpaceVar;
-    if (param === "" || param === null) {
-      whiteSpaceVar = "";
-    } else {
-      whiteSpaceVar = param.replace(/\s+/g, "");
-    }
-    return whiteSpaceVar;
-  }
 
   validateCsv(file: any) {
     // check that file is  aCSV
@@ -45,7 +37,7 @@ export default class Validators {
       return { error: "Invalid file type. Only CSV files are allowed" };
     }
     const oneMB = 1024 * 1024;
-    // check file size
+    // check file size517
     if (file.size > oneMB) {
       //1MB
       return { error: "File size too large" };
@@ -73,5 +65,27 @@ export default class Validators {
 
       // .on('error', reject);
     });
+  }
+  // identify type of identifier passed
+  checkIdentifierIsCCC(identifierNumber: any) {
+    let isValid: boolean = false;
+    let numberToCheck: any = identifierNumber;
+    // remove spaces and special characters
+    numberToCheck = numberToCheck.replace(/[^a-zA-Z0-9]/g, "");
+    // check if all are numbers
+    if (isNaN(numberToCheck)) {
+      isValid = false;
+    }
+    // check if they are 10 digits
+    else if (numberToCheck.length != 10) {
+      isValid = false;
+    }
+    // check position of the hyphen
+    else if (identifierNumber.indexOf("-") != 5) {
+      isValid = false;
+    } else {
+      isValid = true;
+    }
+    return isValid;
   }
 }
