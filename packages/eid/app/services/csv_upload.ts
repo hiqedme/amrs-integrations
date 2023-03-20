@@ -7,25 +7,30 @@ export default class UploadSaveAndArchiveCSV {
       path.dirname(__dirname),
       "../app/uploads/file_csv.csv"
     );
-    const response = this.handleFileUpload(file, uploadPath);
-    //return response;
-    let validation = new Validators();
-    const initval: any = validation.validateCsv(file);
+    
+    const response = await this.handleFileUpload(file, uploadPath);
 
-    if (initval.error) {
-      return "Failed. Kindly re-upload " + initval.error;
-    }
-    const colval: any = validation.validateColumns(uploadPath, [
-      "Patient CCC No",
-      "Collection Date",
-      "Viral Load",
-    ]);
-
-    if (colval.error) {
-      return "Failed. Kindly re-upload " + colval.error;
-    }
+    if(response=="Upload Successful"){
+      let validation = new Validators();
+      const initval: any = validation.validateCsv(file);
+  
+      if (initval.error) {
+        return "Failed. Kindly re-upload " + initval.error;
+      }
+      const colval: any = validation.validateColumns(uploadPath, [
+        "Patient CCC No",
+        "Collection Date",
+        "Viral Load",
+      ]);
+  
+      if (colval.error) {
+        return "Failed. Kindly re-upload " + colval.error;
+      }
+     }
+    return response;
+   
   }
-  handleFileUpload = (file: any, uploadPath: string) => {
+  handleFileUpload = async (file: any, uploadPath: string) => {
     const options = { headers: true, quoteColumns: true };
     const stream = fs.createWriteStream(uploadPath);
     file.pipe(stream);
@@ -33,7 +38,7 @@ export default class UploadSaveAndArchiveCSV {
     return new Promise((resolve, reject) => {
       stream
         .on("error", (err) => console.error(err))
-        .on("finish", () => resolve({ message: "Upload successfully!" }));
+        .on("finish", () => resolve({ message: "Upload Successful" }));
     });
   };
 }

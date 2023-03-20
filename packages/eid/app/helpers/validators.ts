@@ -47,6 +47,7 @@ export default class Validators {
   }
   // check if all the required columns are present
   validateColumns(filePath: fs.PathLike, expectedColumns: any) {
+   
     const file = fs.readFileSync(filePath, "utf-8");
 
     return new Promise<void>((resolve, reject) => {
@@ -55,6 +56,7 @@ export default class Validators {
       }).meta.fields;
 
       let missingColumns = _.difference(expectedColumns, headers || []);
+   
       if (missingColumns.length > 0) {
         reject(
           `The following columns are missing: ${missingColumns.join(", ")}`
