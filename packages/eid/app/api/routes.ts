@@ -36,16 +36,15 @@ export const apiRoutes: ServerRoute[] = [
   },
   {
     method: "POST",
-    path: "/uploads",
+    path: "/api/csvs/uploads",
     options: payload1,
     // upload CSV load
     handler: async (request: any, h) => {
       const file = request.payload.file;
       let uploadService = new UploadSaveAndArchiveCSV();
-      await uploadService.uploadFile(file);
+      const res = await uploadService.uploadFile(file);
 
-      // You can now process the CSV file
-      return "CSV Uploaded";
+      return res
     },
   },
 ];
