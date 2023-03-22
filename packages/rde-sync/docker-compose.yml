@@ -1,0 +1,7 @@
+version: '3'
+services:
+  registry:
+    image: 'ampathke/rde-sync:latest'
+    restart: always
+    volumes: 
+        - ./.env:/packages/eid/.env
