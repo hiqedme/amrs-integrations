@@ -1,8 +1,13 @@
+import pool from "../db";
 
+class PatientService {
+  async getPatientIds() {
+    //TODO
+  }
 
-export default class PatientService {
-
-    public async sayHello(): Promise<string> {
-        return "Hello world!";
-    }
+  async queueRDEPatients() {
+    //TODO insert into rde_sync_queue
+  }
 }
+
+export default PatientService;
