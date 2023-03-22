@@ -28,4 +28,20 @@ export default class GetPatient {
     await CM.releaseConnections(amrsCON);
     return result;
   }
+  // POST TO etl.eid_file_upload_metadata
+  async postToEidFileUploadMetadata(params: any) {
+    let amrsCON = await CM.getConnectionAmrs();
+    let sql = `insert into etl.eid_file_upload_metadata (file_name, file_type, path_to_file, logged_user, status, voided) values('${params.file_name}', '${params.file_type}', '${params.path_to_file}', '${params.logged_user}','${params.status}', '${params.voided}')`;
+    let result: any = await CM.query(sql, amrsCON);
+    await CM.releaseConnections(amrsCON);
+    return result;
+  }
+  // Check if file already exists
+  async checkIfFileExists(params: any) {
+    let amrsCON = await CM.getConnectionAmrs();
+    let sql = `select * from etl.eid_file_upload_metadata where file_name='${params.file_name}'`;
+    let result: any = await CM.query(sql, amrsCON);
+    await CM.releaseConnections(amrsCON);
+    return result;
+  }
 }
