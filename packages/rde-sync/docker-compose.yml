@@ -4,4 +4,4 @@ services:
     image: 'ampathke/rde-sync:latest'
     restart: always
     volumes: 
-        - ./.env:/packages/eid/.env
+        - ./.env:/packages/rde-sync/.env
