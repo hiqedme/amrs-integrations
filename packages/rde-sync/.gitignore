@@ -115,3 +115,6 @@ token.txt
 
 #all DSstore files
 *.DS_Store
+
+.yarn
+*.zip
