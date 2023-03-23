@@ -1,15 +1,6 @@
 import { createPool } from "mysql2/promise";
 import dotenv from "dotenv";
 
-const mysql = require("mysql");
-
-export const con = mysql.createConnection({
-  host: "localhost",
-  user: "dev",
-  password: "Ampathdevs123",
-  database: "rde",
-});
-
 dotenv.config();
 
 export const ETL_POOL = createPool({
