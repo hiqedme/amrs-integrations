@@ -15,4 +15,16 @@ export const apiRoutes: ServerRoute[] = [
       return "success";
     },
   },
+  {
+    method: "DELETE",
+    path: "/api/rde-sync/patient/{id}&purge=true",
+    handler: async function (request, h) {
+      const id = request.params.id;
+
+      const patientService = new PatientService();
+      await patientService.deletePatientRecord(id, h);
+
+      return "deleted";
+    },
+  },
 ];

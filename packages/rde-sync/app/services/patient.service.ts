@@ -53,6 +53,33 @@ class PatientService {
       });
     }
   }
+
+  async updatePatientStatus(
+    patientIds: string[],
+    status: string,
+    h: ResponseToolkit
+  ) {
+    patientIds.forEach(async (id) => {
+      let query = `UPDATE rde_sync_queue SET status = '${status}' WHERE patient_id = ${id}`;
+      const connection = await ETL_POOL.getConnection();
+      const [updates] = await connection.execute(query);
+      connection.release();
+      return h.response(updates).code(200);
+    });
+  }
+
+  async deletePatientRecord(id: string, h: ResponseToolkit) {
+    const identifiers = [id];
+    const [patientId] = await this.getPatientIds(identifiers);
+    if (Array.isArray(patientId)) {
+      const id = patientId[0] as { patient_id: number };
+      const query = `DELETE FROM rde_sync_queue WHERE patient_id = ${id.patient_id}`;
+      const connection = await ETL_POOL.getConnection();
+      const [deleted] = await connection.execute(query);
+      connection.release();
+      return h.response(deleted).code(204);
+    }
+  }
 }
 
 export default PatientService;
