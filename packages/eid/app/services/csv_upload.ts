@@ -8,13 +8,15 @@ export default class UploadSaveAndArchiveCSV {
     let validation = new Validators();
     const fileBeingUploaded: any = validation.validateCsv(file);
 
-    if (fileBeingUploaded.error) {
-      return "Failed. Kindly re-upload " + fileBeingUploaded.error;
+    if (fileBeingUploaded.response) {
+      return { response: fileBeingUploaded.response};
     }
     const uploadPath = path.join(
       path.dirname(__dirname),
-      `../app/uploads/${file.hapi.filename}`
+      `../app/uploads/${username}/${file.hapi.filename}`
     );
+
+    console.log(uploadPath)
 
     // create a payload to be saved in the database
     let uploadPayload = {
@@ -31,7 +33,7 @@ export default class UploadSaveAndArchiveCSV {
     const fileExists = await eidMetaData.checkIfFileExists(uploadPayload);
 
     if (fileExists.length > 0) {
-      return "File already exists";
+      return { response: "File name already exists!" };
     }
 
     // check if file path exists
@@ -48,13 +50,13 @@ export default class UploadSaveAndArchiveCSV {
       }
 
       // upload the file
-      await this.handleFileUpload(file, uploadPath);
+      const res = await this.handleFileUpload(file, uploadPath);
 
-      return "File uploaded successfully";
+      return res;
     } catch (error) {
-      console.log(error);
+      console.log('Something went wrong', error);
     }
-    return "Failed to upload file";
+    return {response: "Failed to upload file"};
   }
 
   handleFileUpload = async (file: any, uploadPath: string) => {
@@ -65,7 +67,7 @@ export default class UploadSaveAndArchiveCSV {
     return new Promise((resolve, reject) => {
       stream
         .on("error", (err) => console.error(err))
-        .on("finish", () => resolve({ message: "Upload successfully!" }));
+        .on("finish", () => resolve({ response: "Upload successfully!" }));
     });
   };
 }

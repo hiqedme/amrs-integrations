@@ -42,9 +42,10 @@ export const apiRoutes: ServerRoute[] = [
     handler: async (request: any, h) => {
       // const file = request.payload.file;
       const {username, file_type, file} = request.payload;
+
       // validate file
       if(!username || !file_type || !file) {
-        return "Failed. Kindly re-upload. Required parameters are missing";
+        return {response: "Failed. Kindly re-upload. Required parameters are missing"};
       }
 
       let uploadService = new UploadSaveAndArchiveCSV();

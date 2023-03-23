@@ -35,19 +35,19 @@ export default class Validators {
     try {
       // Check that file is a CSV
       if (file.hapi.headers["content-type"] !== "text/csv") {
-        return { error: "Invalid file type. Only CSV files are allowed" };
+        return { response: "Invalid file type. Only CSV files are allowed" };
       }
 
       // Check if file size is greater than zero
     if (file._data.length <= 0) {
-      return {error: "Failed. Uploaded file is empty."};
+      return {response: "Failed. Uploaded file is empty."};
     }
 
       return true;
 
     } catch (error) {
       console.error(error);
-      return { error: "An error occurred while validating the CSV file" };
+      return { response: "An error occurred while validating the CSV file" };
     }
   }
   // check if all the required columns are present
