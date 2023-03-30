@@ -1,7 +1,9 @@
-import { ServerRoute } from "@hapi/hapi";
+import { ResponseToolkit, ServerRoute } from "@hapi/hapi";
 import RdeSyncService from "../services/rde-sync.service";
 import MonthlyReportService from "../services/monthly-report.service";
 import { QueuePatientPayload, RDEQueuePayload } from "../models/RequestParams";
+import { PatientIds } from "../models/Model";
+import HIVSummaryService from "../services/hiv-summary.service";
 
 const Joi = require("joi");
 
@@ -130,6 +132,39 @@ export const apiRoutes: ServerRoute[] = [
           userId: Joi.number().integer().required(),
         }),
       },
+    },
+  },
+  {
+    method: "POST",
+    path: "/api/rde-sync/freeze",
+    handler: async function (request, h) {
+      const rdeSyncService = new RdeSyncService();
+
+      return await rdeSyncService.freezingData(
+        request.payload as QueuePatientPayload,
+        h
+      );
+    },
+  },
+  {
+    method: "POST",
+    path: "/api/rde-sync/post-summary-sync-queue",
+    handler: async function (request, h) {
+      const hivSummaryService = new HIVSummaryService();
+
+      const response = await hivSummaryService.createSummarySyncQueue(
+        request.payload as PatientIds,
+        h
+      );
+      return response;
+    },
+  },
+  {
+    method: "GET",
+    path: "/api/rde-sync/get-summary-syc-queue",
+    handler: async function (request, h) {
+      const hivSummaryService = new HIVSummaryService();
+      return await hivSummaryService.getSummarySyncQueue(h);
     },
   },
 ];
