@@ -11,6 +11,8 @@ export default class ExtractVLAndPostToETL {
     try {
       let logMessage: String;
       const helper = new Helpers();
+
+      // this file path needs to be passed from the client
       const file = Fs.readFileSync(
         path.join(path.dirname(__dirname), "../app/uploads/test_data.csv"),
         "utf-8"

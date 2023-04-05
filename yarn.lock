@@ -44,6 +44,7 @@ __metadata:
     "@amrs-integrations/core": ^0.1.0-alpha.18
     "@hapi/hapi": 20.2.2
     "@types/papaparse": ^5.3.7
+    csv-parser: ^3.0.0
     moment: ^2.29.4
     papaparse: ^5.3.2
     ts-node-dev: ^2.0.0
@@ -3041,6 +3042,17 @@ __metadata:
     shebang-command: ^2.0.0
     which: ^2.0.1
   checksum: 671cc7c7288c3a8406f3c69a3ae2fc85555c04169e9d611def9a675635472614f1c0ed0ef80955d5b6d4e724f6ced67f0ad1bb006c2ea643488fcfef994d7f52
+  languageName: node
+  linkType: hard
+
+"csv-parser@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "csv-parser@npm:3.0.0"
+  dependencies:
+    minimist: ^1.2.0
+  bin:
+    csv-parser: bin/csv-parser
+  checksum: adc9d67d9f185249825570778c24d13004625301655330f6b735a052b9fdfbe1a239a014afb1f89939e0626ee573718f71f9f14164db7c17e4bcb2f38d6a162b
   languageName: node
   linkType: hard
 

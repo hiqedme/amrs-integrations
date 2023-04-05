@@ -2,6 +2,10 @@ import { ResponseToolkit, ServerRoute } from "@hapi/hapi";
 import ExtractVLAndPostToETL from "../services/vl_extractor";
 import ExtractCD4AndPostToETL from "../services/cd4_extractor";
 import UploadSaveAndArchiveCSV from "../services/csv_upload";
+import GetCsvFileMetadata from "../services/get_csv_uploads";
+import VoidCsvData from "../services/void_csv_upload";
+import truncateTables from "../services/truncate";
+import ExtractCSVAndPostToETL from "../services/csv_extractor";
 
 let payload1: any = {
   payload: {
@@ -41,16 +45,51 @@ export const apiRoutes: ServerRoute[] = [
     // upload CSV load
     handler: async (request: any, h) => {
       // const file = request.payload.file;
-      const {username, file_type, file} = request.payload;
+      const {username, file_type, file, total_records} = request.payload;
 
       // validate file
-      if(!username || !file_type || !file) {
-        return {response: "Failed. Kindly re-upload. Required parameters are missing"};
+      if(!username || !file_type || !file || !total_records) {
+        return {error: "Failed. Kindly re-upload. Required parameters are missing", status: 'error'};
       }
 
       let uploadService = new UploadSaveAndArchiveCSV();
-      const res = await uploadService.uploadFile(file, username, file_type);
+      const res = await uploadService.uploadFile(file, username, file_type, total_records);
       return res;
+    },
+  },
+
+  {
+    method: "GET",
+    path: "/api/csv/uploads",
+    handler: async (request: any, h) => {
+      // const {username} = request.query;
+      const pageNumber = request.query.pageNumber || 1;
+      const pageSize = request.query.pageSize || 5;
+    let result =  new GetCsvFileMetadata()
+    const res = await result.getCsvData(pageNumber, pageSize)
+    return res
+    },
+  },
+  {
+    method: "PUT",
+    path: "/api/csv/uploads",
+    handler: async (request: any, h) => {
+      // get id from payload
+      const id = request.payload;
+      let result =  new VoidCsvData()
+      const res = await result.voidCsvData(id)
+      return res
+    }
+  },
+  {
+    method: "POST",
+    path: "/api/push/csvs",
+    // extract viral load and send to POC
+    handler: async function (request: any, h ) {
+      const fileName = request.payload;
+     let csvExtractor = new ExtractCSVAndPostToETL();
+     const result = await csvExtractor.readCSVAndPost(fileName);
+      return result;
     },
   },
 ];

@@ -31,7 +31,7 @@ export default class GetPatient {
   // POST TO etl.eid_file_upload_metadata
   async postToEidFileUploadMetadata(params: any) {
     let amrsCON = await CM.getConnectionAmrs();
-    let sql = `insert into etl.eid_file_upload_metadata (file_name, file_type, path_to_file, logged_user, status, voided) values('${params.file_name}', '${params.file_type}', '${params.path_to_file}', '${params.logged_user}','${params.status}', '${params.voided}')`;
+    let sql = `insert into etl.eid_file_upload_metadata (file_name, file_type, path_to_file, logged_user, status, voided, total_records) values('${params.file_name}', '${params.file_type}', '${params.path_to_file}', '${params.logged_user}','${params.status}', '${params.voided}', '${params.total_records}')`;
     let result: any = await CM.query(sql, amrsCON);
     await CM.releaseConnections(amrsCON);
     return result;
@@ -44,4 +44,30 @@ export default class GetPatient {
     await CM.releaseConnections(amrsCON);
     return result;
   }
+  // get file id
+  async getEidCsvMetaData(pageNumber: number, pageSize: number) {
+    const offset = (pageNumber - 1) * pageSize;
+    let amrsCON = await CM.getConnectionAmrs();
+    let sql = `select * from etl.eid_file_upload_metadata where voided=0 limit ${pageSize} offset ${offset}`;
+    let result = await CM.query(sql, amrsCON);
+    await CM.releaseConnections(amrsCON);
+    return result;
+}
+
+// voided 1 on delete
+async voidEidCsvMetaData(params: any) {
+  let amrsCON = await CM.getConnectionAmrs();
+  let sql = `update etl.eid_file_upload_metadata set voided=1 where eid_file_upload_metadata_id='${params}'`;
+  let result = await CM.query(sql, amrsCON);
+  await CM.releaseConnections(amrsCON);
+  return result;
+}
+//truncate table
+async truncateEidCsvMetaData() {
+  let amrsCON = await CM.getConnectionAmrs();
+  let sql = `truncate table etl.eid_file_upload_metadata`;
+  let result = await CM.query(sql, amrsCON);
+  await CM.releaseConnections(amrsCON);
+  return result;
+}
 }
