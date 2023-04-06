@@ -4,7 +4,6 @@ import ExtractCD4AndPostToETL from "../services/cd4_extractor";
 import UploadSaveAndArchiveCSV from "../services/csv_upload";
 import GetCsvFileMetadata from "../services/get_csv_uploads";
 import VoidCsvData from "../services/void_csv_upload";
-import truncateTables from "../services/truncate";
 import ExtractCSVAndPostToETL from "../services/csv_extractor";
 
 let payload1: any = {
@@ -64,7 +63,7 @@ export const apiRoutes: ServerRoute[] = [
     handler: async (request: any, h) => {
       // const {username} = request.query;
       const pageNumber = request.query.pageNumber || 1;
-      const pageSize = request.query.pageSize || 5;
+      const pageSize = request.query.pageSize || 2;
     let result =  new GetCsvFileMetadata()
     const res = await result.getCsvData(pageNumber, pageSize)
     return res

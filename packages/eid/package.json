@@ -24,7 +24,7 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
     "start": "tsc &&  yarn postbuild && node ./dist/app.js",
-    "dev":  "nodemon --exec 'ts-node-dev --no-notify --respawn app.ts'",
+    "dev": "nodemon --exec 'ts-node-dev --no-notify --respawn app.ts'",
     "build": "tsc",
     "postbuild": "rsync -avum --include='*.csv' app/uploads ./dist/app/"
   },

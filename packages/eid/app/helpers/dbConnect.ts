@@ -62,12 +62,4 @@ async voidEidCsvMetaData(params: any) {
   await CM.releaseConnections(amrsCON);
   return result;
 }
-//truncate table
-async truncateEidCsvMetaData() {
-  let amrsCON = await CM.getConnectionAmrs();
-  let sql = `truncate table etl.eid_file_upload_metadata`;
-  let result = await CM.query(sql, amrsCON);
-  await CM.releaseConnections(amrsCON);
-  return result;
-}
 }
