@@ -5,6 +5,7 @@ import UploadSaveAndArchiveCSV from "../services/csv_upload";
 import GetCsvFileMetadata from "../services/get_csv_uploads";
 import VoidCsvData from "../services/void_csv_upload";
 import ExtractCSVAndPostToETL from "../services/csv_extractor";
+import UpdateStatus from "../services/update_status";
 
 let payload1: any = {
   payload: {
@@ -63,7 +64,7 @@ export const apiRoutes: ServerRoute[] = [
     handler: async (request: any, h) => {
       // const {username} = request.query;
       const pageNumber = request.query.pageNumber || 1;
-      const pageSize = request.query.pageSize || 2;
+      const pageSize = request.query.pageSize || 5;
     let result =  new GetCsvFileMetadata()
     const res = await result.getCsvData(pageNumber, pageSize)
     return res
@@ -90,5 +91,15 @@ export const apiRoutes: ServerRoute[] = [
      const result = await csvExtractor.readCSVAndPost(fileName);
       return result;
     },
+  },
+  //update status of csv file
+  {
+    method: "PUT",
+    path: "/api/csv/update_status",
+    handler: async (request: any, h) => {
+      let result =  new UpdateStatus()
+      const res = await result.updateStatus(request.payload)
+      return res
+    }
   },
 ];

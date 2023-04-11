@@ -21,13 +21,22 @@ export default class GetPatient {
     await CM.releaseConnections(amrsCON);
     return result;
   }
-  async checkPatientDataSync(params: any, uuid: string) {
+  async checkPatientVLSync(params: any, uuid: string) {
     let amrsCON = await CM.getConnectionAmrs();
-    let sql = `select count(encounter_id)  as count from etl.flat_labs_and_imaging where test_datetime='${params.collection_date}' and uuid='${uuid}' and hiv_viral_load = '${params.viral_load}'`;
+    let sql = `select count(encounter_id)  as count from etl.flat_labs_and_imaging where test_datetime='${params.collection_date}' and uuid='${uuid}' and hiv_viral_load = '${params.value}'`;
     let result: any = await CM.query(sql, amrsCON);
     await CM.releaseConnections(amrsCON);
     return result;
   }
+
+  async checkPatientCD4Sync(params: any, uuid: string) {
+    let amrsCON = await CM.getConnectionAmrs();
+    let sql = `select count(encounter_id)  as count from etl.flat_labs_and_imaging where test_datetime='${params.collection_date}' and uuid='${uuid}' and cd4_count = '${params.value}'`;
+    let result: any = await CM.query(sql, amrsCON);
+    await CM.releaseConnections(amrsCON);
+    return result;
+  }
+
   // POST TO etl.eid_file_upload_metadata
   async postToEidFileUploadMetadata(params: any) {
     let amrsCON = await CM.getConnectionAmrs();
@@ -58,6 +67,15 @@ export default class GetPatient {
 async voidEidCsvMetaData(params: any) {
   let amrsCON = await CM.getConnectionAmrs();
   let sql = `update etl.eid_file_upload_metadata set voided=1 where eid_file_upload_metadata_id='${params}'`;
+  let result = await CM.query(sql, amrsCON);
+  await CM.releaseConnections(amrsCON);
+  return result;
+}
+
+// update status and successful records
+async updateEidCsvMetaData(params: any) {
+  let amrsCON = await CM.getConnectionAmrs();
+  let sql = `update etl.eid_file_upload_metadata set status='${params.status}', successful='${params.successful}' where eid_file_upload_metadata_id='${params.eid_file_upload_metadata_id}'`;
   let result = await CM.query(sql, amrsCON);
   await CM.releaseConnections(amrsCON);
   return result;
