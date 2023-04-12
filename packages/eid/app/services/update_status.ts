@@ -8,4 +8,12 @@ export default class UpdateStatus {
             return updateStatus;
         }
     }
+
+    public async updateExistingData(params: any) {
+        let dataToBeUpdated =  new GetPatient()
+        const updateRecords = await dataToBeUpdated.updateExistingData(params);
+        if(updateRecords.affectedRows > 0) {
+            return updateRecords
+        }
+    }
 }

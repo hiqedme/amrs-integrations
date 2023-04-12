@@ -80,4 +80,13 @@ async updateEidCsvMetaData(params: any) {
   await CM.releaseConnections(amrsCON);
   return result;
 }
+
+// update existing data
+async updateExistingData(params: any) {
+  let amrsCON = await CM.getConnectionAmrs();
+  let sql = `update etl.eid_file_upload_metadata set existing_records='${params.existing_records}' where eid_file_upload_metadata_id='${params.eid_file_upload_metadata_id}'`;
+  let result = await CM.query(sql, amrsCON);
+  await CM.releaseConnections(amrsCON);
+  return result;
+}
 }
