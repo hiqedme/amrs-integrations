@@ -54,10 +54,11 @@ export default class GetPatient {
     return result;
   }
   // get file id
-  async getEidCsvMetaData(pageNumber: number, pageSize: number) {
+  async getEidCsvMetaData(params: string, pageNumber: number, pageSize: number) {
     const offset = (pageNumber - 1) * pageSize;
     let amrsCON = await CM.getConnectionAmrs();
-    let sql = `select * from etl.eid_file_upload_metadata where voided=0 limit ${pageSize} offset ${offset}`;
+    // get all records where logged_user = params and voided = 0
+    let sql = `select * from etl.eid_file_upload_metadata where logged_user='${params}' and voided=0 order by eid_file_upload_metadata_id desc limit ${pageSize} offset ${offset}`;
     let result = await CM.query(sql, amrsCON);
     await CM.releaseConnections(amrsCON);
     return result;
@@ -75,7 +76,8 @@ async voidEidCsvMetaData(params: any) {
 // update status and successful records
 async updateEidCsvMetaData(params: any) {
   let amrsCON = await CM.getConnectionAmrs();
-  let sql = `update etl.eid_file_upload_metadata set status='${params.status}', successful='${params.successful}' where eid_file_upload_metadata_id='${params.eid_file_upload_metadata_id}'`;
+  let id = await this.getEidCsvMetaDataId(params.file_name);
+  let sql = `update etl.eid_file_upload_metadata set status='${params.status}', successful='${params.successful}' where eid_file_upload_metadata_id='${id[0].eid_file_upload_metadata_id}'`;
   let result = await CM.query(sql, amrsCON);
   await CM.releaseConnections(amrsCON);
   return result;
@@ -84,7 +86,29 @@ async updateEidCsvMetaData(params: any) {
 // update existing data
 async updateExistingData(params: any) {
   let amrsCON = await CM.getConnectionAmrs();
-  let sql = `update etl.eid_file_upload_metadata set existing_records='${params.existing_records}' where eid_file_upload_metadata_id='${params.eid_file_upload_metadata_id}'`;
+  // get eid_file_upload_metadata_id
+  let id = await this.getEidCsvMetaDataId(params.file_name);
+  let sql = `update etl.eid_file_upload_metadata set status='${params.status}', existing_records='${params.existing_records}' where eid_file_upload_metadata_id='${id[0].eid_file_upload_metadata_id}'`;
+  let result = await CM.query(sql, amrsCON);
+  await CM.releaseConnections(amrsCON);
+  return result;
+}
+
+// update failed data
+async updateFailedData(params: any) {
+  let amrsCON = await CM.getConnectionAmrs();
+  // get eid_file_upload_metadata_id
+  let id = await this.getEidCsvMetaDataId(params.file_name);
+  let sql = `update etl.eid_file_upload_metadata set status='${params.status}', failed='${params.failed_records}' where eid_file_upload_metadata_id='${id[0].eid_file_upload_metadata_id}'`;
+  let result = await CM.query(sql, amrsCON);
+  await CM.releaseConnections(amrsCON);
+  return result;
+}
+
+// get eid_file_upload_metadata_id
+async getEidCsvMetaDataId(params: any) {
+  let amrsCON = await CM.getConnectionAmrs();
+  let sql = `select eid_file_upload_metadata_id from etl.eid_file_upload_metadata where file_name='${params}'`;
   let result = await CM.query(sql, amrsCON);
   await CM.releaseConnections(amrsCON);
   return result;

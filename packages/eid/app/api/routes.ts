@@ -62,11 +62,11 @@ export const apiRoutes: ServerRoute[] = [
     method: "GET",
     path: "/api/csv/uploads",
     handler: async (request: any, h) => {
-      // const {username} = request.query;
+      const { logged_user} = request.query;
       const pageNumber = request.query.pageNumber || 1;
-      const pageSize = request.query.pageSize || 5;
+      const pageSize = request.query.pageSize || 50;
     let result =  new GetCsvFileMetadata()
-    const res = await result.getCsvData(pageNumber, pageSize)
+    const res = await result.getCsvData(logged_user, pageNumber, pageSize)
     return res
     },
   },
@@ -91,15 +91,5 @@ export const apiRoutes: ServerRoute[] = [
      const result = await csvExtractor.readCSVAndPost(fileName);
       return result;
     },
-  },
-  //update status of csv file
-  {
-    method: "PUT",
-    path: "/api/csv/update_status",
-    handler: async (request: any, h) => {
-      let result =  new UpdateStatus()
-      const res = await result.updateStatus(request.payload)
-      return res
-    }
   },
 ];
