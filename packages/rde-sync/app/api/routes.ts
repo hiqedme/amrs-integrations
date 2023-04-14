@@ -23,7 +23,7 @@ export const apiRoutes: ServerRoute[] = [
       validate: {
         payload: Joi.object({
           identifiers: Joi.array().items(Joi.string()).required(),
-          userId: Joi.number().integer().required(),
+          userId: Joi.string().required(),
           reportingMonth: Joi.string().required(),
         }),
       },
@@ -64,7 +64,7 @@ export const apiRoutes: ServerRoute[] = [
     options: {
       validate: {
         query: Joi.object({
-          user_id: Joi.number().integer().required(),
+          user_id: Joi.string().required(),
           reporting_month: Joi.string().required(),
         }),
       },
@@ -145,6 +145,15 @@ export const apiRoutes: ServerRoute[] = [
         h
       );
     },
+    options: {
+      validate: {
+        payload: Joi.object({
+          patientIds: Joi.array().items(Joi.string()).required(),
+          userId: Joi.string().required(),
+          reportingMonth: Joi.string().required(),
+        }),
+      },
+    },
   },
   {
     method: "POST",
@@ -157,6 +166,13 @@ export const apiRoutes: ServerRoute[] = [
         h
       );
       return response;
+    },
+    options: {
+      validate: {
+        payload: Joi.object({
+          patientIds: Joi.array().items(Joi.string()).required(),
+        }),
+      },
     },
   },
   {
