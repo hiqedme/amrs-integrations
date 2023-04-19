@@ -45,15 +45,23 @@ export const apiRoutes: ServerRoute[] = [
     // upload CSV load
     handler: async (request: any, h) => {
       // const file = request.payload.file;
-      const {username, file_type, file, total_records} = request.payload;
+      const { username, file_type, file, total_records } = request.payload;
 
       // validate file
-      if(!username || !file_type || !file || !total_records) {
-        return {error: "Failed. Kindly re-upload. Required parameters are missing", status: 'error'};
+      if (!username || !file_type || !file || !total_records) {
+        return {
+          error: "Failed. Kindly re-upload. Required parameters are missing",
+          status: "error",
+        };
       }
 
       let uploadService = new UploadSaveAndArchiveCSV();
-      const res = await uploadService.uploadFile(file, username, file_type, total_records);
+      const res = await uploadService.uploadFile(
+        file,
+        username,
+        file_type,
+        total_records
+      );
       return res;
     },
   },
@@ -62,12 +70,12 @@ export const apiRoutes: ServerRoute[] = [
     method: "GET",
     path: "/api/csv/uploads",
     handler: async (request: any, h) => {
-      const { logged_user} = request.query;
+      const { logged_user } = request.query;
       const pageNumber = request.query.pageNumber || 1;
       const pageSize = request.query.pageSize || 50;
-    let result =  new GetCsvFileMetadata()
-    const res = await result.getCsvData(logged_user, pageNumber, pageSize)
-    return res
+      let result = new GetCsvFileMetadata();
+      const res = await result.getCsvData(logged_user, pageNumber, pageSize);
+      return res;
     },
   },
   {
@@ -76,20 +84,55 @@ export const apiRoutes: ServerRoute[] = [
     handler: async (request: any, h) => {
       // get id from payload
       const id = request.payload;
-      let result =  new VoidCsvData()
-      const res = await result.voidCsvData(id)
-      return res
-    }
+      let result = new VoidCsvData();
+      const res = await result.voidCsvData(id);
+      return res;
+    },
   },
   {
     method: "POST",
     path: "/api/push/csvs",
     // extract viral load and send to POC
-    handler: async function (request: any, h ) {
+    handler: async function (request: any, h) {
       const fileName = request.payload;
-     let csvExtractor = new ExtractCSVAndPostToETL();
-     const result = await csvExtractor.readCSVAndPost(fileName);
+      let csvExtractor = new ExtractCSVAndPostToETL();
+      const result = await csvExtractor.readCSVAndPost(fileName);
       return result;
+    },
+  },
+  // get logs
+  {
+    method: "GET",
+    path: "/api/csv/logs",
+    handler: async function (request: any, h: ResponseToolkit) {
+      const fs = require("fs");
+      const path = require("path");
+      const logsPath = path.join(__dirname, "..", "..", "..", "logs.log");
+      const logs = fs.readFileSync(logsPath, "utf-8").trim(); // trim() to remove any trailing whitespace
+
+      if (logs === "") {
+        return []; // return an empty array if logs is empty
+      }
+      const logsArray = logs.split("\n");
+      if (logsArray[logsArray.length - 1] === "") {
+        logsArray.pop(); // remove the last element if it's an empty string
+      }
+      // return logs based on the query params
+      const { file_name } = request.query;
+      if (file_name) {
+        const filteredLogs = logsArray.filter((log: any) => {
+          try {
+            const parsedLog = JSON.parse(log);
+            return parsedLog.filename === file_name;
+          } catch (e) {
+            console.error(`Error parsing log: error: ${e}`);
+            return false;
+          }
+        });
+        return filteredLogs;
+      } else {
+        return logsArray;
+      }
     },
   },
 ];
