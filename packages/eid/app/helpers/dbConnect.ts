@@ -21,9 +21,9 @@ export default class GetPatient {
     await CM.releaseConnections(amrsCON);
     return result;
   }
-  async checkPatientVLSync(params: any, uuid: string) {
+  async checkPatientVLSync(params: any, viralValue: any,  uuid: string) {
     let amrsCON = await CM.getConnectionAmrs();
-    let sql = `select count(encounter_id)  as count from etl.flat_labs_and_imaging where test_datetime='${params.collectionDate}' and uuid='${uuid}' and hiv_viral_load = '${params.value}'`;
+    let sql = `select count(encounter_id)  as count from etl.flat_labs_and_imaging where test_datetime='${params.collectionDate}' and uuid='${uuid}' and hiv_viral_load = '${viralValue}'`;
     let result: any = await CM.query(sql, amrsCON);
     await CM.releaseConnections(amrsCON);
     return result;

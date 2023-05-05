@@ -6,7 +6,6 @@ import GetPatient from "../helpers/dbConnect";
 import Helpers from "../helpers/helperFunctions";
 import moment from "moment";
 import config from "@amrs-integrations/core";
-import axios from "axios";
 import { logToFile } from "../helpers/logger";
 
 export default class ExtractCSVAndPostToETL {
@@ -36,10 +35,10 @@ export default class ExtractCSVAndPostToETL {
                 "Lab Viral Load": value,
                 "Collection Date": collectionDate,
                 "Patient CCC No": patientCCCNo,
-                "Lab ID": order,
+                "Order No": order,
               } = row;
               // Check if any of the extracted columns are empty
-              if (!value || !collectionDate || !patientCCCNo || !order) {
+              if (!value || !collectionDate || !patientCCCNo) {
                 logToFile(
                   filename,
                   "error",
@@ -58,10 +57,23 @@ export default class ExtractCSVAndPostToETL {
                 isValidCCC
               );
 
+              let valid: any = validator.checkStatusOfViralLoad(value);
+              if (valid === 2) {
+                failed++;
+                logToFile(
+                  filename,
+                  "error",
+                  `${patientCCCNo}': Record has erroneous viral load value: ' ${value}`
+                );
+                return;
+              }
+              let viralValue = valid == 1 ? value : 0;
+
               if (patientID.length > 0) {
                 // check if data is already synced
                 const isDataSynced = await getPatient.checkPatientVLSync(
                   row,
+                  viralValue,
                   patientID[0].uuid
                 );
 
@@ -73,17 +85,7 @@ export default class ExtractCSVAndPostToETL {
                     `'Record already exist for this patientCCCNo: ' ${patientCCCNo}`
                   );
 
-                  const params = {
-                    file_name: filename,
-                    existing_records: alreadySynced,
-                    status: "Error",
-                  };
-                  const updateSyncStatus = await getPatient.updateExistingData(
-                    params
-                  );
-                  if (updateSyncStatus.affectedRows > 0) {
-                    console.log("sync status updated");
-                  }
+                  return;
                 }
 
                 let collection_date = moment
@@ -91,11 +93,11 @@ export default class ExtractCSVAndPostToETL {
                   .add(3, "hours")
                   .format();
                 let obs: EIDPayloads.Observation = {
-                  person: patientUUID,
+                  person: patientID[0].uuid,
                   concept: "a8982474-1350-11df-a1f1-0026b9348838",
                   obsDatetime: collection_date,
-                  value: value,
-                  order: order,
+                  value: valid == 1 ? value : 0,
+                  order: "",
                 };
 
                 let httpClient = new config.HTTPInterceptor(
@@ -105,35 +107,28 @@ export default class ExtractCSVAndPostToETL {
                   "dhp",
                   ""
                 );
+
                 httpClient.axios
                   .post("", obs)
                   .then(async (openHIMResp: any) => {
+                    successfulSync++;
                     console.log(
                       "VL saved successfully",
                       openHIMResp.identifier
                     );
                   })
-                  .catch((err: any) => {
-                    console.log("Error", err);
+                  .catch(async (err: any) => {
+                    console.log("Error syncing:", err);
+                    failed++;
                     logToFile(
                       filename,
                       "error",
-                      `'Error saving VL for this patientCCCNo: ' ${patientCCCNo}`
+                      `'Error syncing VL for this patientCCCNo: ' ${patientCCCNo}`
                     );
                   });
               } else {
                 failed++;
-                const params = {
-                  file_name: filename,
-                  failed_records: failed,
-                  status: "Error",
-                };
-                const updateSyncStatus = await getPatient.updateFailedData(
-                  params
-                );
-                if (updateSyncStatus.affectedRows > 0) {
-                  console.log("failed sync status updated");
-                }
+
                 logToFile(
                   filename,
                   "error",
@@ -157,7 +152,7 @@ export default class ExtractCSVAndPostToETL {
                 "Provider ID": order,
               } = row;
               // Check if any of the extracted columns are empty
-              if (!value || !collectionDate || !patientCCCNo || !order) {
+              if (!value || !collectionDate || !patientCCCNo) {
                 logToFile(
                   filename,
                   "error",
@@ -182,17 +177,6 @@ export default class ExtractCSVAndPostToETL {
                 );
                 if (isCD4Synced[0].count > 0) {
                   alreadySynced++;
-                  const params = {
-                    file_name: filename,
-                    existing_records: alreadySynced,
-                    status: "Error",
-                  };
-                  const updateSyncStatus = await getPatient.updateExistingData(
-                    params
-                  );
-                  if (updateSyncStatus.affectedRows > 0) {
-                    console.log("sync status updated");
-                  }
                   logToFile(
                     filename,
                     "error",
@@ -202,10 +186,10 @@ export default class ExtractCSVAndPostToETL {
 
                 let obs: EIDPayloads.Observation = {
                   person: patientUUID,
-                  concept: "a8982474-1350-11df-a1f1-0026b9348838",
+                  concept: "457c741d-8f71-4829-b59d-594e0a618892",
                   obsDatetime: collectionDate,
                   value: value,
-                  order: order,
+                  order: order || "",
                 };
 
                 let httpClient = new config.HTTPInterceptor(
@@ -218,45 +202,22 @@ export default class ExtractCSVAndPostToETL {
                 httpClient.axios
                   .post("", obs)
                   .then(async (openHIMResp: any) => {
+                    alreadySynced++;
                     console.log(
                       "cd4 saved successfully",
                       openHIMResp.identifier
                     );
                   })
                   .catch((err: any) => {
+                    failed++;
                     logToFile(
                       filename,
                       "error",
                       `'Error:  ${err} for this patientCCCNo: ' ${patientCCCNo}`
                     );
                   });
-
-                const params = {
-                  file_name: filename,
-                  successful: successfulSync,
-                  status: "synced",
-                };
-                const updateSyncStatus = await getPatient.updateEidCsvMetaData(
-                  params
-                );
-
-                if (updateSyncStatus.affectedRows > 0) {
-                  console.log("sync status updated");
-                }
               } else {
                 failed++;
-                const params = {
-                  file_name: filename,
-                  failed_records: failed,
-                  status: "Error",
-                };
-                const updateSyncStatus = await getPatient.updateFailedData(
-                  params
-                );
-                if (updateSyncStatus.affectedRows > 0) {
-                  // console.log('failed sync status updated')
-                  return { message: `failed to sync ${failed} rows` };
-                }
                 logToFile(
                   filename,
                   "error",
@@ -277,6 +238,43 @@ export default class ExtractCSVAndPostToETL {
           return reject("File is neither a CD4 nor a viral load file");
         }
       });
+      // update metadata
+      if (alreadySynced > 0) {
+        const params = {
+          file_name: filename,
+          existing_records: alreadySynced,
+          status: "Error",
+        };
+        const updateSyncStatus = await getPatient.updateExistingData(params);
+        if (updateSyncStatus.affectedRows > 0) {
+          console.log("sync status updated");
+        }
+      }
+
+      if (successfulSync > 0) {
+        const params = {
+          file_name: filename,
+          successful: successfulSync,
+          status: "synced",
+        };
+        const updateSyncStatus = await getPatient.updateEidCsvMetaData(params);
+
+        if (updateSyncStatus.affectedRows > 0) {
+          console.log("sync status updated");
+        }
+      }
+
+      if (failed > 0) {
+        const params = {
+          file_name: filename,
+          failed_records: failed,
+          status: "Error",
+        };
+        const updateSyncStatus = await getPatient.updateFailedData(params);
+        if (updateSyncStatus.affectedRows > 0) {
+          console.log("failed sync status updated");
+        }
+      }
 
       return {
         message: "CSV file is being processed",

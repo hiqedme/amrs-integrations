@@ -46,7 +46,7 @@ export default class ExtractVLAndPostToETL {
         );
 
         //check if data is already synced
-        obs_count = await getPatient.checkPatientVLSync(data, patientUUID);
+        obs_count = await getPatient.checkPatientVLSync(data, isCCC, patientUUID);
         if (obs_count[0].count > 0) {
           logMessage = "Patient Results Already Synced" + data.patient_ccc_no;
           //data already synced for this patient
