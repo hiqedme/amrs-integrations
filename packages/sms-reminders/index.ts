@@ -21,7 +21,7 @@ switch (args[2]) {
         SendNotifications();
         break;
     case 'test':
-        SendSMS('{"rtc_date":"2022-09-10","phone_number":"'+args[3]+'","language":"english","messageType":"congratulations","person_name":"Rono","person_id":"12345"}');
+        SendSMS({rtc_date:"2022-09-10",phone_number:args[3],language:"english",messageType:"congratulations",person_name:"Rono",person_id:"12345"});
         break;
     case 'update_delivery':
         UpdateDelivery();

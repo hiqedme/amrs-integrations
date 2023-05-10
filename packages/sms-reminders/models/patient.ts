@@ -28,7 +28,10 @@ export interface Patient {
   nearest_center: string;
   timeToSend: string;
   language: string;
+  language_preference:number
   messageType: string;
+  consent:number;
+  smsReceiveTime:string;
 }
 export interface SMSResponse {
   person_id: number;

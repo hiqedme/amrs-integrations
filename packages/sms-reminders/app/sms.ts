@@ -7,12 +7,12 @@ import { isValidPhoneNumber, parsePhoneNumber } from "libphonenumber-js";
 import { checkNumber, fetchClientsWithPendingDeliveryStatus, saveNumber, saveOrUpdateSMSResponse } from "../models/queries";
 
 export async function SendSMS(params: any) {
-  let smsParams: Patient = JSON.parse(params);
+  let smsParams: Patient = params;
+  console.log(smsParams,smsParams.rtc_date)
   // TODO: Check the telco used for the provider then pick approapriate shortcode
   if (smsParams.phone_number && isValidPhoneNumber(smsParams.phone_number, "KE")) {
     const phoneNumber = parsePhoneNumber(smsParams.phone_number, "KE");
     let numberExist: any[] = await checkNumber(phoneNumber.number);
-    console.log(numberExist);
     if (
       (smsParams.messageType === "welcome" &&
         numberExist.length > 0 &&
@@ -33,7 +33,7 @@ export async function SendSMS(params: any) {
         numberExist[0].status === "optedout")
     ) {
       let status = smsParams.messageType === "optout" ? "optedout" : "active";
-      saveNumber(phoneNumber.number, status, numberExist.length > 0);
+      await saveNumber(phoneNumber.number, status, numberExist.length > 0);
     }
     let appointmentDate = moment(smsParams.rtc_date).format("YYYY-MM-DD");
     let sms = "";
@@ -49,7 +49,7 @@ export async function SendSMS(params: any) {
         dictionary.templates.find(
           (x: { type: string }) => x.type === smsParams.messageType
         )?.kiswahili || "";
-        console.log('sending message',smsParams.messageType,sms)
+        console.log('sending message',smsParams.messageType,sms,phoneNumber.number)
     }
     let httpClient = new config.HTTPInterceptor(
       config.sms.url || "",
@@ -57,38 +57,39 @@ export async function SendSMS(params: any) {
       "",
       "sms"
     );
-
+   
     if (sms !== "") {
       let smsContent = sms
         .replace("$personName$", personName)
         .replace("$rtc_date$", appointmentDate);
-      let sendSMSResponse: any = await httpClient.axios(
-        "/services/sendsms/",
-        {
-          method: "post",
-          data: qs.stringify({
-            shortcode: config.sms.shortCode,
-            partnerID: config.sms.partnerID,
-            apikey: config.sms.apiKey,
-            mobile: phoneNumber.number,
-            timeToSend: smsParams.timeToSend,
-            message: smsContent,
-          }),
+        console.log(smsContent);
+        let sendSMSResponse: any = await httpClient.axios(
+          "/sms",
+          {
+            method: "post",
+            data: qs.stringify({
+              shortcode: config.sms.shortCode,
+              partnerID: config.sms.partnerID,
+              apikey: config.sms.apiKey,
+              mobile: phoneNumber.number,
+              timeToSend: smsParams.timeToSend,
+              message: smsContent,
+            }),
+          }
+        );
+        //Save the message response
+        let date_created=moment()
+        .format("YYYY-MM-DD hh:mm:ss");;
+        let smsResponse:SMSResponse={
+          person_id: smsParams.person_id,
+          phone_number: phoneNumber.number,
+          message_type: smsParams.messageType,
+          message_id: sendSMSResponse.responses[0]["messageid"],
+          date_created: date_created,
+          delivery_status: "pending"
         }
-      );
-      // Save the message response
-      let date_created=moment()
-      .format("YYYY-MM-DD");;
-      let smsResponse:SMSResponse={
-        person_id: smsParams.person_id,
-        phone_number: phoneNumber.number,
-        message_type: smsParams.messageType,
-        message_id: sendSMSResponse.responses[0]["messageid"],
-        date_created: date_created,
-        delivery_status: "pending"
-      }
-      await saveOrUpdateSMSResponse(smsResponse,"create")
-      return sendSMSResponse;
+        await saveOrUpdateSMSResponse(smsResponse,"create")
+      return smsResponse;
     } else {
       console.log("Invalid phone number");
     }
@@ -100,19 +101,21 @@ export async function UpdateDelivery() {
   let messageID:[]=await fetchClientsWithPendingDeliveryStatus();
   //update status
   let httpClient = new config.HTTPInterceptor(
-    config.sms.url || "",
+    "https://quicksms.advantasms.com/api",
     "",
     "",
     "sms"
   );
-  messageID.forEach(async (message_id:any) =>{
-    console.log(message_id.message_id)
+  for (let index = 0; index < messageID.length; index++) {
+    const element:any = messageID[index];
+    
+    console.log(element.message_id)
     let sendSMSResponse: any = await httpClient.axios(
       "/services/getdlr/",
       {
         method: "get",
         data: qs.stringify({
-          messageID: message_id.message_id,
+          messageID: element.message_id,
           partnerID: config.sms.partnerID,
           apikey: config.sms.apiKey
         }),
@@ -124,10 +127,10 @@ export async function UpdateDelivery() {
       person_id: 0,
       phone_number: "",
       message_type: "",
-      message_id: message_id.message_id,
+      message_id: element.message_id,
       date_created: "",
       delivery_status: sendSMSResponse["delivery-description"]
     }
     await saveOrUpdateSMSResponse(deliveryReport,"update")
-  })
+  }
 }
