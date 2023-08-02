@@ -4,6 +4,7 @@ import GetCsvFileMetadata from "../services/get_csv_uploads";
 import VoidCsvData from "../services/void_csv_upload";
 import ExtractCSVAndPostToETL from "../services/csv_extractor";
 import UpdateStatus from "../services/update_status";
+import ExtractINSAndPostToETL from "../services/ins_extractor";
 
 let payload1: any = {
   payload: {
@@ -75,6 +76,17 @@ export const apiRoutes: ServerRoute[] = [
       const fileName = request.payload;
       let csvExtractor = new ExtractCSVAndPostToETL();
       const result = await csvExtractor.readCSVAndPost(fileName);
+      return result;
+    },
+  },
+  {
+    method: "POST",
+    path: "/api/push/ins",
+    // extract viral load and send to POC
+    handler: async function (request: any, h) {
+      const fileName = request.payload;
+      let insExtractor = new ExtractINSAndPostToETL();
+      const result = await insExtractor.readINSAndPost(fileName);
       return result;
     },
   },
