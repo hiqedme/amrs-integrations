@@ -22,7 +22,7 @@ export async function RetrieveAppointments(
     //Retrieve clients who have consented and never received a welcome message in the last 5 minutes;
     let last5 = moment().subtract(5, "minutes").format("YYYY-MM-DD HH:mm:ss");
     let clients = await getConsentedAndOptedoutClients(last5);
-    await QueueAppointments(clients, messageType);
+    await QueueAppointments(clients, messageType,"");
   } else if (messageType === "congratulations") {
     //Retrieve clients who have honored appointments in the last hour;
     let lastHour = moment().subtract(1, "hour").format("YYYY-MM-DD HH:mm:ss");
@@ -30,61 +30,55 @@ export async function RetrieveAppointments(
       moment().format("YYYY-MM-DD"),
       lastHour
     );
-    await QueueAppointments(honouredAppointments, messageType);
+    await QueueAppointments(honouredAppointments, messageType,"");
   } else if (messageType === "missed") {
     let yesterday = moment().subtract(1, "day").format("YYYY-MM-DD");
     let missedAppointments = await getMissedAppointments(yesterday);
-    await QueueAppointments(missedAppointments, messageType);
+    await QueueAppointments(missedAppointments, messageType,"");
   } else {
     let appointments = await dailyAppointmentsquery(appointmentDate);
-    await QueueAppointments(appointments, messageType);
+    let actualAppointments=appointments.filter(
+      (item) =>
+        moment(item.next_clinical_encounter_datetime).isBefore(
+          appointmentDate,
+          'date'
+        ) && moment(appointmentDate).isBefore(moment(item.latest_rtc_date), 'date')
+    );
+    let pendingAppointments = appointments.filter((item) => !actualAppointments.includes(item));
+    await QueueAppointments(pendingAppointments, messageType,appointmentDate);
   }
 }
 
 export async function QueueAppointments(
   patients: Patient[],
-  messageType: string
+  messageType: string,
+  appointmentDate:string
 ) {
   let count = 0;
   if(patients.length != 0){
-  const producer = new Producer();
-  patients.forEach(async (element) => {
-    const message = new Message();
-    // get consent
-    let consent = await GetPatientConsent(element.uuid);
-    if (consent[0] !== "") {
-      count++;
-      //|| messageType === "optout" TODO
-      element.timeToSend =
-        messageType === "optout" || "welcome" || "sameday"
-          ? ""
-          : moment().format("YYYY-MM-DD") +
-            " " +
-            moment(consent[0]).format("HH:mm");
-      element.language = consent[1];
-      element.messageType = messageType;
-      message
-        .setBody(JSON.stringify(element))
-        .setTTL(3600000) // in millis
-        .setQueue("appointments_queue");
+  for (let index = 0; index < patients.length; index++) {
+    const element = patients[index];
+      // get consent
+      if (element.consent === 1065) {
+        count++;
 
-      producer.produce(message, (err) => {
-        if (err) console.log(err);
-        else {
-          const msgId = message.getId(); // string
-          console.log("Successfully produced. Message ID is ", msgId,element.person_name,consent);
+        element.timeToSend =
+          messageType === "optout" || "welcome" || "sameday"
+            ? ""
+            : moment().format("YYYY-MM-DD") +
+            " " +
+            moment(element.smsReceiveTime).format("HH:mm");
+        element.language = element.language_preference == 1598?"english":"kiswahili" ;
+        element.messageType = messageType;
+        if(appointmentDate!==""){
+          element.rtc_date=new Date(appointmentDate);
         }
-      });
-    } else {
-      count++
-      console.log(element.person_name + " not consented ",patients.length,count);
+        await SendSMS(element);
+      } else {
+        count++;
+        console.log(element.person_name + " not consented ", patients.length, count);
+      }
     }
-    console.log(element.person_name + " not consented ",patients.length,count);
-     // if all appointments were queued successfuly, shutdown producer and exit with code 0
-     if (count == patients.length) {
-      producer.shutdown(process.exit(0));
-    }
-  });
 }else{
   process.exit(0);
 }
@@ -99,9 +93,6 @@ export async function SendNotifications() {
   ) => {
     const payload: Patient = msg.getBody();
     console.log("Message payload", payload);
-    // send sms
-    await SendSMS(payload);
-    //check response for success or error. if error
     cb(); // acknowledging the message
   };
 
