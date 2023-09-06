@@ -31,7 +31,14 @@ export default class GetPatient {
 
   async checkPatientCD4Sync(params: any, uuid: string, date_collected: any) {
     let amrsCON = await CM.getConnectionAmrs();
-    let sql = `select count(encounter_id)  as count from etl.flat_labs_and_imaging where test_datetime='${date_collected}' and uuid='${uuid}' and cd4_count = '${params.value}'`;
+    let sql = `select count(encounter_id)  as count from etl.flat_labs_and_imaging where test_datetime='${date_collected}' and uuid='${uuid}' and cd4_count = '${params.AVGCD3CD4AbsCnt}'`;
+    let result: any = await CM.query(sql, amrsCON);
+    await CM.releaseConnections(amrsCON);
+    return result;
+  }
+  async checkPatientEIDSync(params: any, uuid: string, date_collected: any) {
+    let amrsCON = await CM.getConnectionAmrs();
+    let sql = `select count(encounter_id)  as count from etl.flat_labs_and_imaging where test_datetime='${date_collected}' and uuid='${uuid}' and hiv_dna_pcr = '${params.value}'`;
     let result: any = await CM.query(sql, amrsCON);
     await CM.releaseConnections(amrsCON);
     return result;
@@ -91,8 +98,16 @@ export default class GetPatient {
   // get eid_file_upload_metadata_id
   async getEidCsvMetaDataId(params: any) {
     let amrsCON = await CM.getConnectionAmrs();
-    let sql = `select eid_file_upload_metadata_id from etl.eid_file_upload_metadata where file_name='${params}'`;
+    let sql = `insert into etl.eid_cd4_sync values('','${params}')`;
     let result = await CM.query(sql, amrsCON);
+    await CM.releaseConnections(amrsCON);
+    return result;
+  }
+
+  async saveCD4(params: any) {
+    let amrsCON = await CM.getConnectionAmrs();
+    let sql = `select * from etl.eid_file_upload_metadata where file_name='${params.file_name}'`;
+    let result: any = await CM.query(sql, amrsCON);
     await CM.releaseConnections(amrsCON);
     return result;
   }

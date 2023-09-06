@@ -1,7 +1,7 @@
 version: '3'
 services:
   registry:
-    image: 'ampathke/eid:latest'
+    image: 'ampathke/amrs-eid:eid-cd4'
     restart: always
     volumes: 
         - ./.env:/packages/eid/.env
