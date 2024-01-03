@@ -81,7 +81,7 @@ export default class GetPatient {
   async updateEidCsvMetaData(params: any) {
     let amrsCON = await CM.getConnectionAmrs();
     let id = await this.getEidCsvMetaDataId(params.file_name);
-    let sql = `update etl.eid_file_upload_metadata set status='${params.status}', existing_records='${params.existing_records}',failed='${params.failed_records}', successful='${params.successful}' where eid_file_upload_metadata_id='${id[0].eid_file_upload_metadata_id}'`;
+    let sql = `update etl.eid_file_upload_metadata set status='${params.status}', existing_records='${params.existing_records}',failed='${params.failed_records}', successful='${params.successful}' where eid_file_upload_metadata_id=38`;
     console.log(sql);
     let result = await CM.query(sql, amrsCON);
     await CM.releaseConnections(amrsCON);
