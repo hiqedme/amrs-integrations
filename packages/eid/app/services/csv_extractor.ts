@@ -33,135 +33,6 @@ export default class ExtractCSVAndPostToETL {
       const isCD4File = fileContents.includes("CD4 abs");
 
       if (isViralLoadFile) {
-<<<<<<< Updated upstream
-        try {
-          // Replace spaces in headers with underscores
-          const options = {
-            header: true,
-            transformHeader: (header: string) =>
-              header.replace(/\s+/g, "_").toLowerCase(),
-          };
-
-          const rows = Papa.parse(fileContents, options).data;
-
-          total = rows.length;
-          // Iterate through rows and make POST request
-          for (let row of rows) {
-            console.log(row);
-            // Get patient UUID using identifier
-            let data: any = row;
-            //check if all required columns are available
-            if (
-              !data.lab_viral_load ||
-              !data.collection_date ||
-              !data.patient_ccc_no 
-            ) {
-              failed++;
-              logToFile(
-                filename,
-                "error",
-                `${data.patient_ccc_no}': One or more extracted columns are empty' `
-              );
-              continue;
-            }
-
-            let patientCCCNo = data.patient_ccc_no;
-            let value = data.lab_viral_load;
-            let collectionDate = data.collection_date;
-            let order = data.order_number ? data.order_number : '';;
-            // Check if the patient CCC number is valid
-
-            const isValidCCC = validator.checkIdentifierIsCCC(patientCCCNo);
-
-            // get the patient uuid from db
-            const patientID = await getPatient.getPatientUUIDUsingIdentifier(
-              patientCCCNo,
-              isValidCCC
-            );
-            if (patientID.length == 0) {
-              failed++;
-              logToFile(
-                filename,
-                "error",
-                `${patientCCCNo}': No record for this patient'`
-              );
-              continue;
-            }
-            uuid = patientID[0].uuid;
-            // check if viral load value is valid
-            let valid: any = validator.checkStatusOfViralLoad(value);
-            if (valid === 2) {
-              failed++;
-              logToFile(
-                filename,
-                "error",
-                `${patientCCCNo}': Record has erroneous viral load value: ' ${value}`
-              );
-              continue;
-            }
-            let viralValue = valid == 1 ? value : 0;
-            let collection_date = moment
-              .utc(collectionDate, "DD/MM/YYYY")
-              .add(3, "hours")
-              .format("YYYY-MM-DD 00:00:00");
-
-            // check if data is already synced
-            const isDataSynced = await getPatient.checkPatientVLSync(
-              collection_date,
-              viralValue,
-              uuid
-            );
-
-            if (isDataSynced[0].count > 0) {
-              alreadySynced++;
-              logToFile(
-                filename,
-                "info",
-                `${patientCCCNo}': Record already exists'`
-              );
-
-              continue;
-            }
-            let obs: EIDPayloads.Observation = {
-              person: uuid,
-              concept: "a8982474-1350-11df-a1f1-0026b9348838",
-              obsDatetime: collection_date,
-              value: valid == 1 ? value : 0,
-              order: order,
-            };
-
-            ResultData.push(obs);
-            let httpClient = new config.HTTPInterceptor(
-                    config.dhp.url || "http://10.50.80.56:5001/eid/csv",
-              // "http://10.50.80.56:5001/staging/eid/csv",
-              "",
-              "",
-              "dhp",
-              ""
-            );
-
-            httpClient.axios
-              .post("", obs)
-              .then(async (openHIMResp: any) => {
-                successfulSync++;
-                console.log("VL saved successfully", openHIMResp.identifier);
-              })
-              .catch(async (err: any) => {
-                console.log("Error syncing:", err);
-                failed++;
-                logToFile(
-                  filename,
-                  "error",
-                  `${patientCCCNo}': Error syncing VL '`
-                );
-              });
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      } else if (isCD4File) {
-=======
->>>>>>> Stashed changes
         // try {
         //   // Replace spaces in headers with underscores
         //   const options = {
@@ -192,19 +63,10 @@ export default class ExtractCSVAndPostToETL {
         //       continue;
         //     }
 
-<<<<<<< Updated upstream
         //     let patientCCCNo = data.ampath_no;
         //     let value = data.cd4_abs;
         //     let collectionDate = data.date_collected_drawn;
         //     let order = data.order_number;
-=======
-        //     let patientCCCNo = data.patient_ccc_no;
-        //     let value = data.lab_viral_load;
-        //     let viralValue = null;
-        //     let collectionDate = data.collection_date;
-        //     let order = data.order_number ? data.order_number : "";
-        //     let conceptId = "";
->>>>>>> Stashed changes
         //     // Check if the patient CCC number is valid
 
         //     const isValidCCC = validator.checkIdentifierIsCCC(patientCCCNo);
@@ -224,8 +86,6 @@ export default class ExtractCSVAndPostToETL {
         //       continue;
         //     }
         //     uuid = patientID[0].uuid;
-<<<<<<< Updated upstream
-=======
         //     // check if viral load value is valid
         //     let valid: any = validator.checkStatusOfViralLoad(value);
         //     if (valid === 2) {
@@ -243,7 +103,6 @@ export default class ExtractCSVAndPostToETL {
         //       conceptId = "a8982474-1350-11df-a1f1-0026b9348838";
         //       viralValue = valid == 1 ? value : 0;
         //     }
->>>>>>> Stashed changes
 
         //     let collection_date = moment
         //       .utc(collectionDate, "DD/MM/YYYY")

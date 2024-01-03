@@ -24,4 +24,17 @@ export default class Helpers {
     }
     return whiteSpaceVar;
   }
+  //split to CCC number
+  splitToCCC(patient_no: string) {
+    var newCCC;
+    if ((patient_no.length != 10)||(patient_no.charAt(4) === "-")) {
+      newCCC = patient_no;
+      return newCCC;
+    }
+    const inputString = patient_no; // Your 10-character string
+    const part1 = inputString.slice(0, 5);
+    const part2 = inputString.slice(5, 10);
+    newCCC = `${part1}-${part2}`;
+    return newCCC;
+  }
 }
