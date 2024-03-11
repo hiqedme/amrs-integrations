@@ -35,7 +35,7 @@ export const apiRoutes: ServerRoute[] = [
       }
 
       let uploadService = new UploadSaveAndArchiveCSV();
-      const res = await uploadService.uploadFile(
+      const res:any = await uploadService.uploadFile(
         file,
         username,
         file_type,
@@ -87,7 +87,13 @@ export const apiRoutes: ServerRoute[] = [
       const fileName = request.payload;
       let insExtractor = new ExtractINSAndPostToETL();
       const result = await insExtractor.readINSAndPost(fileName);
-      return result;
+      const res = JSON.parse(result)
+      if(res["status"] === "failed"){
+        return h.response(res).code(400)
+      }else{
+        return h.response(res).code(201)
+      }
+      
     },
   },
   // get logs

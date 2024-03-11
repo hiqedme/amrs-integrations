@@ -25,6 +25,8 @@ export default class Validators {
       viralLoadPayload.trim() === "Target Not Detected"
     ) {
       status = 0;
+    } else if (viralLoadPayload === "Collect New Sample") {
+      status = 3;
     } else {
       status = 2;
     }
@@ -35,19 +37,24 @@ export default class Validators {
     try {
       // Check that file is a CSV
       if (file.hapi.headers["content-type"] !== "text/csv") {
-        return { error: "Invalid file type. Only CSV files are allowed", status: 'error' };
+        return {
+          error: "Invalid file type. Only CSV files are allowed",
+          status: "error",
+        };
       }
 
       // Check if file size is greater than zero
-    if (file._data.length <= 0) {
-      return {error: "Failed. Uploaded file is empty.", status: 'error'};
-    }
+      if (file._data.length <= 0) {
+        return { error: "Failed. Uploaded file is empty.", status: "error" };
+      }
 
       return true;
-
     } catch (error) {
       console.error(error);
-      return { error: "An error occurred while validating the CSV file", status: 'error' };
+      return {
+        error: "An error occurred while validating the CSV file",
+        status: "error",
+      };
     }
   }
   // check if all the required columns are present

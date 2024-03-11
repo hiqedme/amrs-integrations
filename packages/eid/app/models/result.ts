@@ -20,7 +20,7 @@ declare module EIDPayloads {
     person: string;
     concept: string;
     obsDatetime: any;
-    value: number;
+    value: any;
     order: string;
   }
 }

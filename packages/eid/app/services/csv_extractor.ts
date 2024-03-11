@@ -44,14 +44,13 @@ export default class ExtractCSVAndPostToETL {
           total = rows.length;
           // Iterate through rows and make POST request
           for (let row of rows) {
-            console.log(row);
             // Get patient UUID using identifier
             let data: any = row;
             //check if all required columns are available
             if (
               !data.lab_viral_load ||
               !data.collection_date ||
-              !data.patient_ccc_no 
+              !data.patient_ccc_no
             ) {
               failed++;
               logToFile(
@@ -64,8 +63,10 @@ export default class ExtractCSVAndPostToETL {
 
             let patientCCCNo = data.patient_ccc_no;
             let value = data.lab_viral_load;
+            let viralValue = null;
             let collectionDate = data.collection_date;
-            let order = data.order_number ? data.order_number : '';;
+            let order = data.order_number ? data.order_number : "";
+            let conceptId = "";
             // Check if the patient CCC number is valid
 
             const isValidCCC = validator.checkIdentifierIsCCC(patientCCCNo);
@@ -95,8 +96,14 @@ export default class ExtractCSVAndPostToETL {
                 `${patientCCCNo}': Record has erroneous viral load value: ' ${value}`
               );
               continue;
+            } else if (valid === 3) {
+              conceptId = "457c741d-8f71-4829-b59d-594e0a618892";
+              viralValue = "a89c3f1e-1350-11df-a1f1-0026b9348838";
+            } else {
+              conceptId = "a8982474-1350-11df-a1f1-0026b9348838";
+              viralValue = valid == 1 ? value : 0;
             }
-            let viralValue = valid == 1 ? value : 0;
+
             let collection_date = moment
               .utc(collectionDate, "DD/MM/YYYY")
               .add(3, "hours")
@@ -121,15 +128,15 @@ export default class ExtractCSVAndPostToETL {
             }
             let obs: EIDPayloads.Observation = {
               person: uuid,
-              concept: "a8982474-1350-11df-a1f1-0026b9348838",
+              concept: conceptId,
               obsDatetime: collection_date,
-              value: valid == 1 ? value : 0,
+              value: viralValue,
               order: order,
             };
 
             ResultData.push(obs);
             let httpClient = new config.HTTPInterceptor(
-                    config.dhp.url || "http://10.50.80.56:5001/eid/csv",
+              config.dhp.url || "http://10.50.80.56:5001/eid/csv",
               // "http://10.50.80.56:5001/staging/eid/csv",
               "",
               "",
@@ -164,9 +171,7 @@ export default class ExtractCSVAndPostToETL {
         //     transformHeader: (header: string) =>
         //       header.replace(/\s+/g, "_").toLowerCase(),
         //   };
-
         //   const rows = Papa.parse(fileContents, options).data;
-
         //   total = rows.length;
         //   // Iterate through rows and make POST request
         //   for (let row of rows) {
@@ -188,15 +193,12 @@ export default class ExtractCSVAndPostToETL {
         //       );
         //       continue;
         //     }
-
         //     let patientCCCNo = data.ampath_no;
         //     let value = data.cd4_abs;
         //     let collectionDate = data.date_collected_drawn;
         //     let order = data.order_number;
         //     // Check if the patient CCC number is valid
-
         //     const isValidCCC = validator.checkIdentifierIsCCC(patientCCCNo);
-
         //     // get the patient uuid from db
         //     const patientID = await getPatient.getPatientUUIDUsingIdentifier(
         //       patientCCCNo,
@@ -212,19 +214,16 @@ export default class ExtractCSVAndPostToETL {
         //       continue;
         //     }
         //     uuid = patientID[0].uuid;
-
         //     let collection_date = moment
         //       .utc(collectionDate, "DD/MM/YYYY")
         //       .add(3, "hours")
         //       .format("YYYY-MM-DD 00:00:00");
-
         //     // check if data is already synced
         //     const isDataSynced = await getPatient.checkPatientCD4Sync(
         //       row,
         //       patientID,
         //       collection_date
         //     );
-
         //     if (isDataSynced[0].count > 0) {
         //       alreadySynced++;
         //       logToFile(
@@ -232,7 +231,6 @@ export default class ExtractCSVAndPostToETL {
         //         "info",
         //         `${patientCCCNo}': Record already exists'`
         //       );
-
         //       continue;
         //     }
         //     let obs: EIDPayloads.Observation = {
@@ -242,7 +240,6 @@ export default class ExtractCSVAndPostToETL {
         //       value: value,
         //       order: order,
         //     };
-
         //     ResultData.push(obs);
         //     let httpClient = new config.HTTPInterceptor(
         //       config.dhp.url || "http://10.50.80.56:5001/eid/csv",
@@ -252,7 +249,6 @@ export default class ExtractCSVAndPostToETL {
         //       "dhp",
         //       ""
         //     );
-
         //     httpClient.axios
         //       .post("", obs)
         //       .then(async (openHIMResp: any) => {
