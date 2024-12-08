@@ -12,7 +12,7 @@ const logger = createLogger({
     myFormat
   ),
   transports: [
-    new transports.File({ filename: 'logs_CD4_12NOV.log' }),
+    new transports.File({ filename: 'logs_vl_2024.log' }),
   ],
 });
 
